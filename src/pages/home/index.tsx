@@ -1,3 +1,7 @@
 import HomeView from "./home";
 
-export default HomeView;
+function Home() {
+  return <HomeView />;
+}
+
+export default Home;
