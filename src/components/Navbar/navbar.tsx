@@ -1,9 +1,11 @@
-import React, {useState} from "react";
-import logo from "../../images/logo.png"
+import React, {Dispatch, SetStateAction, useState} from "react";
+import logo from "../../images/logo.png";
+
 
 function Navbar(){
     const [nav, setNav] = useState<boolean>(false);
 
+   
     const changeBackground = () => {
         if(window.scrollY >= 50){
             setNav(true);
@@ -23,6 +25,7 @@ function Navbar(){
         document.getElementById("clicked-sign")?.classList.add("active");
         document.getElementById("clicked-login")?.classList.remove("active");
         document.getElementById("clicked-home")?.classList.remove("active");
+        
     }
 
     function LoginClicked(){
@@ -31,6 +34,8 @@ function Navbar(){
         document.getElementById("clicked-home")?.classList.remove("active");
     }
     return (
+        <>
+    
         <nav className={nav ? 'nav active' : 'nav'}>
             <a href="#" className="logo">
                 <img src={logo} alt=''/>
@@ -47,6 +52,7 @@ function Navbar(){
                 <li onClick={() => LoginClicked()}><a id="clicked-login" href="#">Login</a></li>
             </ul>
         </nav>
+        </>
     )
 }
 
