@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap');
+
+.admin-navigation{
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    min-height: 90vh;
+    background: #fff;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    bottom: 20px;
+    width: 70px;
+    border-radius: 10px;
+    box-sizing: initial;
+    border-left: 5px solid #813AFE;
+    background: #813AFE;
+    transition: width 0.25s;
+    overflow-x: hidden;
+
+    ul{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding-left: 5px;
+        padding-top: 40px;
+    }
+
+    ul li{
+        position: relative;
+        list-style: none;
+        width: 100%;
+        border-top-left-radius: 20px;
+        border-bottom-left-radius: 20px;
+    }
+
+    .active{
+        background: white;
+    }
+
+    .active a{
+        color: black;
+    }
+
+    .active svg{
+        color: black;
+    }
+
+    ul li a{
+        position: relative;
+        display: block;
+        width: 100%;
+        display: flex;
+        text-decoration: none;
+        color: white;
+    }
+
+    ul li a .icon{
+        position: relative;
+        display: block;
+        min-width: 60px;
+        height: 60px;
+        line-height: 60px;
+        text-align: center;
+    }
+
+    ul li a .icon svg{
+        font-size: 1em;
+    }
+
+    ul li a .title{
+        position: relative;
+        display: block;
+        padding-left: 10px;
+        height: 60px;
+        line-height: 60px;
+        white-space: normal;
+    }
+}
+
+.admin-navigation.active{
+    width: 300px;
+
+}
+
+.toggle-admin-sidenav{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: #813AFE;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.toggle-admin-sidenav.active{
+    background: #ff4d89;
+}
+
+.toggle-admin-sidenav svg{
+    position: absolute;
+    color: white;
+    font-size: 34px;
+    display: none;
+}
+
+.toggle-admin-sidenav svg.open,
+.toggle-admin-sidenav.active svg.close{
+    display: block;
+}
+
+.toggle-admin-sidenav.active svg.open,
+.toggle-admin-sidenav svg.close{
+    display: none;
+}
+

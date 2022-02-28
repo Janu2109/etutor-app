@@ -22,7 +22,6 @@ function Login({ setView }: { setView: Dispatch<SetStateAction<number>> }) {
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [response, setResponse] = useState<user[]>([]);
 
   var emptyString = "";
 
@@ -35,9 +34,12 @@ function Login({ setView }: { setView: Dispatch<SetStateAction<number>> }) {
       axios
         .get(`api/user/login?username=${username}&password=${password}`)
         .then((res) => {
-          setResponse(res.data);
           dispatch(login(res.data.id));
-          //navigate("/dashboard");
+          if(res.data.isAdministrator === true){
+            navigate("/admin");
+          }else{
+            toast.warning("Access Denied");
+          }
         })
         .catch(() => toast.error("Incorreect Login Details"));
     }
