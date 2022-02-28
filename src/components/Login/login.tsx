@@ -36,7 +36,7 @@ function Login({ setView }: { setView: Dispatch<SetStateAction<number>> }) {
         .get(`api/user/login?username=${username}&password=${password}`)
         .then((res) => {
           setResponse(res.data);
-          dispatch(login(res.data));
+          dispatch(login(res.data.id));
           //navigate("/dashboard");
         })
         .catch(() => toast.error("Incorreect Login Details"));
