@@ -10,6 +10,7 @@ import Presentation from "../../components/Presentation/presentation";
 import Login from "../../components/Login/login";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SignUp from "../../components/Sign Up/sign";
+import { ToastContainer } from "react-toastify";
 
 function HomeView() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ function HomeView() {
   const [view, setView] = useState<number>(1);
 
   return (
+    <>
     <div id="homecontainer">
     
     {view === 1 ? (
@@ -36,6 +38,7 @@ function HomeView() {
     ):(<></>)}
       
     </div>
+    </>
   );
 }
 
