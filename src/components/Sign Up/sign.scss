@@ -1,0 +1,41 @@
+#signup-container{
+    .icon-img{
+        width: 70px;
+        height: 70px;
+        margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: #813AFE;
+        border-color: #813AFE;
+    }
+    .left{
+        transform: translateY(35px) !important;
+    }
+
+    .right{
+        float: right !important;
+        min-width: 120% !important;
+        transform: translateX(300px);
+    }
+
+    .row{
+        width: 100% !important;
+    }
+
+    .btn-margin{
+        margin-bottom: 20px;
+    }
+}
+
+@media(max-width: 800px){
+    .left{
+        transform: translateY(0px);
+        transform: translateX(60px);
+    }
+
+    .right{
+        display: none;
+    }
+}

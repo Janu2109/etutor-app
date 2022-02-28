@@ -3,31 +3,39 @@ import React, { useState } from "react";
 import Header from "../../components/Header/header";
 import Features from "../../components/Feature/feature";
 import About from "../../components/About/about";
-import "./home.css";
+import "./home.scss";
 import aboutImage from "../../images/about.png";
 import aboutImage1 from "../../images/download.png";
 import Presentation from "../../components/Presentation/presentation";
-import { MDBBtn,
-  MDBModal,
-  MDBModalDialog,
-  MDBModalContent,
-  MDBModalHeader,
-  MDBModalTitle,
-  MDBModalBody,
-  MDBModalFooter,
-} from 'mdb-react-ui-kit';
+import Login from "../../components/Login/login";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import SignUp from "../../components/Sign Up/sign";
 
 function HomeView() {
   const navigate = useNavigate();
 
+  const [view, setView] = useState<number>(1);
+
   return (
-    <>
-    <Header/>
-      <Features/>
-      <About image={aboutImage} title='Never miss due dates again' button="Sign Up"/>
-      <Presentation/>
-      <About image={aboutImage1} title='Sign Up and Join Us Now' button="Sign Up"/>  
-    </>
+    <div id="homecontainer">
+    
+    {view === 1 ? (
+      <>
+        <Header view={view} setView={setView}/>
+        <Features/>
+        <About image={aboutImage} title='Never miss due dates again' button="Sign Up" setView={setView}/>
+        <Presentation/>
+        <About image={aboutImage1} title='Sign Up and Join Us Now' button="Sign Up" setView={setView}/>  
+        </>
+    ): view === 2 ? (
+        <>
+        <Login setView={setView}/>
+        </>
+    ): view === 3 ? (
+          <SignUp setView={setView}/>
+    ):(<></>)}
+      
+    </div>
   );
 }
 
