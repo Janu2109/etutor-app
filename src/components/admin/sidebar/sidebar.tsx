@@ -13,31 +13,39 @@ import {
   faQuestion,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
 function Sidebar() {
-  let list = document.querySelectorAll(".list");
-  for (let i = 0; i < list.length; i++) {
-    list[i].onclick = function () {
-      let j = 0;
-      while (j < list.length) {
-        list[j++].className = "list";
-      }
-      list[i].className = "list active";
-    };
+  const [switchButton, setSwitchButton] = useState<boolean>(false);
 
-    let menuToggle = document.querySelector(".toggle-admin-sidenav");
-    let navigator  = document.querySelector(".admin-navigation");
-    menuToggle.onclick = function (){
-        console.log("Toggle Clicked");
-      menuToggle.classList.toggle("active");
-      navigator.classList.toggle("active");
-      console.log("Class List", menuToggle.classList);
-    };
+  const [sideNav, setSideNav] = useState<boolean>(false);
+  // let list = document.querySelectorAll<HTMLElement>(".list");
+  // for (let i = 0; i < list.length; i++) {
+  //   list[i].onclick = function () {
+  //     let j = 0;
+  //     while (j < list.length) {
+  //       list[j++].className = "list";
+  //     }
+  //     list[i].className = "list active";
+  //   };
+
+  //   let menuToggle = document.querySelector<HTMLElement>(".toggle-admin-sidenav");
+  //   let navigator  = document.querySelector<HTMLElement>(".admin-navigation");
+  //   menuToggle!.onclick = function (){
+  //     menuToggle!.classList.toggle("active");
+  //     navigator!.classList.toggle("active");
+  //     console.log("Class List", menuToggle!.classList);
+  //   };
+  // }
+
+  function ToggleMenuShow(){
+ setSwitchButton(!switchButton);
+ setSideNav(!sideNav);
   }
 
   return (
     <>
-      <div className="admin-navigation">
+      <div id="admin-sidenav-main" className={sideNav ? "admin-navigation active" : "admin-navigation"}>
         <ul>
           <li className="list active">
             <a href="#">
@@ -97,7 +105,7 @@ function Sidebar() {
           </li>
         </ul>
       </div>
-      <div className="toggle-admin-sidenav">
+      <div onClick={() => ToggleMenuShow()} id="toggleButton" className={switchButton ? `toggle-admin-sidenav active` : `toggle-admin-sidenav`}>
         <FontAwesomeIcon className="open" icon={faBars} color="white" />
         <FontAwesomeIcon className="close" icon={faClose} color="white" />
       </div>
