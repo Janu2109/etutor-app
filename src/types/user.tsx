@@ -1,14 +1,14 @@
 export type user= {
-Id: number,
-Username: string,
-Password: string,
-FirstName: string,
-LastName: string,
-IdNo: number,
-City: string,
-Email: string,
-IsStudent: boolean,
-IsLecturer: boolean,
-IsAdministrator: boolean,
-DateJoined: Date
+id: number,
+username: string,
+password: string,
+firstName: string,
+lastName: string,
+idNo: number,
+city: string,
+email: string,
+isStudent: boolean,
+isLecturer: boolean,
+isAdministrator: boolean,
+dateJoined: Date
 }
