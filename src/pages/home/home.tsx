@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import { useState } from "react";
 import Header from "../../components/Header/header";
 import Features from "../../components/Feature/feature";
 import About from "../../components/About/about";
@@ -10,10 +10,8 @@ import Presentation from "../../components/Presentation/presentation";
 import Login from "../../components/Login/login";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SignUp from "../../components/Sign Up/sign";
-import { ToastContainer } from "react-toastify";
 
 function HomeView() {
-  const navigate = useNavigate();
 
   const [view, setView] = useState<number>(1);
 

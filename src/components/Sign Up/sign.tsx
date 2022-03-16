@@ -1,10 +1,63 @@
-import React, { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Col, Row, Container, Form, Button } from "react-bootstrap";
 import loginIcon from "../../images/user.svg";
 import "./sign.scss";
 import uiImg from "../../images/register.svg";
+import { toast, ToastContainer } from "react-toastify";
+import validator from 'validator'
+import axios from "../../types/axios";
 
 function SignUp({setView}:{setView: Dispatch<SetStateAction<number>>}) {
+
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [firstname, setFirstname] = useState<string>("");
+  const [lastname, setLastname] = useState<string>("");
+  const [idnumber, setIdnumber] = useState<any>(0);
+  const [city, setCity] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [errorCode, setErrorCode] = useState<number>(0);
+
+  function SignUp(){
+    var emptyString = "";
+    if (validator.isEmail(email)) {
+      setErrorCode(0);
+      console.log(errorCode);
+    } else {
+     toast.error('Enter valid email');
+     setErrorCode(1);
+     console.log(errorCode);
+    }
+    if(username === emptyString || password === emptyString || firstname === emptyString || lastname === emptyString || idnumber === 0 || city === emptyString || email === emptyString){
+        toast.error("All fields are required");
+    }
+    else if(idnumber.length < 13|| idnumber.length > 13){
+      toast.error("Id number not correct");
+    }
+    else if(idnumber.length > 12 && idnumber.length < 14){
+      if (validator.isStrongPassword(password, {
+        minLength: 0, minLowercase: 0,
+        minUppercase: 1, minNumbers: 1, minSymbols: 0
+      })) {
+        setErrorCode(0);
+        console.log(errorCode);
+      } else {
+        setErrorCode(1);
+        console.log(errorCode);
+        toast.error('Password requires uppercase and numbers')
+      }
+    }
+    if(errorCode === 0){
+      axios.post(`api/user/register?userName=${username}&password=${password}&firstName=${firstname}&lastName=${lastname}&idNo=${idnumber}&city=${city}&email=${email}`)
+      .then(() => {
+        toast.success('User Registered');
+      })
+      .catch(() => {
+        toast.error('Error Adding User');
+      })
+    }
+  }
+
   return (
     <div id="signup-container">
       <Container className="mt-5">
@@ -14,33 +67,33 @@ function SignUp({setView}:{setView: Dispatch<SetStateAction<number>>}) {
               <h5>Sign Up</h5>
             <Form>
               <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Control type="text" placeholder="UserName" />
+                <Form.Control type="text" placeholder="UserName" onChange={(e) => setUsername(e.currentTarget.value)}/>
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Control type="password" placeholder="Password" />
+                <Form.Control type="password" placeholder="Password" onChange={(e) => setPassword(e.currentTarget.value)}/>
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Control type="text" placeholder="First Name" />
+                <Form.Control type="text" placeholder="First Name" onChange={(e) => setFirstname(e.currentTarget.value)}/>
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Control type="text" placeholder="Last Name" />
+                <Form.Control type="text" placeholder="Last Name" onChange={(e) => setLastname(e.currentTarget.value)}/>
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Control type="text" placeholder="ID Number" />
+                <Form.Control type="text" placeholder="ID Number" onChange={(e) => setIdnumber(e.target.value as any)}/>
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Control type="text" placeholder="City Of Residence" />
+                <Form.Control type="text" placeholder="City Of Residence" onChange={(e) => setCity(e.currentTarget.value)}/>
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Control type="email" placeholder="Email Address" />
+                <Form.Control type="email" placeholder="Email Address" onChange={(e) => setEmail(e.currentTarget.value)}/>
               </Form.Group>
-              <Button style={{width:"100%"}} variant="primary btn-block" className="btn-margin">
+              <Button style={{width:"100%"}} variant="primary btn-block" className="btn-margin" onClick={() => SignUp()}>
                 Register
               </Button>
               <Button onClick={() => setView(1)} style={{width:"100%"}} variant="primary btn-block">
@@ -52,6 +105,7 @@ function SignUp({setView}:{setView: Dispatch<SetStateAction<number>>}) {
           <Col lg={8} md={6} sm={12}><img className="w-100 right" src={uiImg} alt="Icon"/></Col>
         </Row>
       </Container>
+      <ToastContainer />
     </div>
   );
 }

@@ -57,7 +57,7 @@ function Login({ setView }: { setView: Dispatch<SetStateAction<number>> }) {
                 <Form.Control
                   onChange={(e) => setUsername(e.currentTarget.value)}
                   type="email"
-                  placeholder="Enter email"
+                  placeholder="Enter username"
                 />
               </Form.Group>
 
