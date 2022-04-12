@@ -3,15 +3,19 @@ import Sidebar from "../../../components/admin/sidebar/sidebar";
 import Header from "../../../components/Navbar/index";
 import logo from "../../../images/logo.png";
 import "./dashboard.scss";
+import Icon from "../../../images/man.png";
 
 function Dashboard() {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
-const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-
-const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
+  const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
 
   return (
-    <div className={isDarkMode ? "admin-dash-container dark-mode" : "admin-dash-container"}>
+    <div
+      className={
+        isDarkMode ? "admin-dash-container dark-mode" : "admin-dash-container"
+      }
+    >
       <nav id="adminNav" className={sideNavToggle ? "" : "nav-closed"}>
         <div className="logo-name">
           <div className="logo-image">
@@ -65,25 +69,61 @@ const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
                 <i className="uil uil-wind-moon" />
                 <span className="link-name">Dark Mode</span>
               </a>
-              <div className="mode-toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
-              <span className="switch"></span>
+              <div
+                className="mode-toggle"
+                onClick={() => setIsDarkMode(!isDarkMode)}
+              >
+                <span className="switch"></span>
               </div>
-              
             </li>
           </ul>
         </div>
       </nav>
 
-    <section className="dashboard">
+      <section className="dashboard">
         <div className="top">
-        <i className="uil uil-list-ul sidebar-toggle" onClick={() => setSideNavToggle(!sideNavToggle)}/>
-        <div className="search-box">
-        <i className="uil uil-search"/>
-            <input type="text" placeholder="Search here..."/>
+          <i
+            className="uil uil-list-ul sidebar-toggle"
+            onClick={() => setSideNavToggle(!sideNavToggle)}
+          />
+          <div className="search-box">
+            <i className="uil uil-search" />
+            <input type="text" placeholder="Search here..." />
+          </div>
+          <img src={Icon} alt="" />
         </div>
+        <div className="dash-content">
+          <div className="overview">
+            <div className="title">
+              <i className="uil uil-tachometer-fast" />
+              <span className="text">Dashboard</span>
+            </div>
+            <div className="boxes">
+              <div className="box box1">
+              <i className="uil uil-user"/>
+                <span className="text">
+                  Total Users
+                </span>
+                <span className="number">50,120</span>
+              </div>
+              <div className="box box2">
+              <i className="uil uil-book-reader"/>
+                <span className="text">
+                  Total Students
+                </span>
+                <span className="number">50,120</span>
+              </div>
+              <div className="box box3">
+              <i className="uil uil-user-md"/>
+                <span className="text">
+                  Total Lecturers
+                </span>
+                <span className="number">50,120</span>
+              </div>
+            </div>
+          </div>
         </div>
-    </section>
-
+      </section>
     </div>
   );
 }

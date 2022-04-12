@@ -34,6 +34,12 @@ body{
           }
         }
       }
+
+      li{
+        a:hover:before{
+          background-color: var(--text-color);
+        }
+      }
 }
 
 .dark-mode{
@@ -78,6 +84,13 @@ body{
       left: 73px;
       width: calc(100% - 73px);
   }
+
+  .nav-closed ~ .dashboard{
+    .top{
+    left: 73px;
+    width: calc(100% - 73px);
+    }
+}
 
   #adminNav {
     position: fixed;
@@ -182,6 +195,21 @@ body{
         }
       }
 
+      body.dark{
+      .nav-links {
+        li {
+          a:hover {
+            .link-name {
+              color: var(--primary-color);
+            }
+            i {
+              color: var(--text-color);
+            }
+          }
+        }
+      }
+    }
+
       .mode-toggle{
           height: 50px;
           min-width: 45px;
@@ -248,6 +276,35 @@ body{
       padding: 10px 14px;
       transition: var(--tran-05);
 
+      .dash-content{
+        padding-top: 50px;
+
+        .title{
+          display: flex;
+          align-items: center;
+          margin: 20px 0 30px 0;
+          i{
+            position: relative;
+            height: 35px;
+            width: 35px;
+            background-color: var(--primary-color);
+            border-radius: 6px;
+            color: var(--title-icon-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+          }
+
+          .text{
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-left: 10px;
+          }
+        }
+      }
+
       .top{
         padding: 10px 14px;
         top: 0;
@@ -258,6 +315,45 @@ body{
           justify-content: space-between;
           align-items: center;
           background-color: var(--panel-color);
+          transition: var(--tran-05);
+
+          img{
+            width: 40px;
+            border-radius: 50%;
+
+          }
+
+          .search-box{
+            position: relative;
+            height: 45px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 30px;
+
+            input{
+              position: absolute;
+              border: 1px solid var(--border-color);
+              background-color: var(--panel-color);
+              padding: 0 25px 0 50px;
+              height: 100%;
+              width: 100%;
+              border-radius: 5px;
+              color: var(--text-color);
+              font-size: 15px;
+              font-weight: 400;
+              outline: none;
+            }
+
+            i{
+              position: absolute;
+              left: 15px;
+              font-size: 22px;
+              z-index: 10;
+              top: 50%;
+              transform: translateY(-50%);
+              color: var(--black-light-color);
+            }
+          }
 
           .sidebar-toggle{
             font-size: 26px;
@@ -265,5 +361,7 @@ body{
             cursor: pointer;
           }
       }
+
+     
   }
 }
