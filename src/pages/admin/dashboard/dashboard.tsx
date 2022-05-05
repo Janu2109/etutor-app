@@ -1,14 +1,54 @@
-import { useState } from "react";
-import Sidebar from "../../../components/admin/sidebar/sidebar";
-import Header from "../../../components/Navbar/index";
+import { useCallback, useEffect, useState } from "react";
 import logo from "../../../images/logo.png";
 import "./dashboard.scss";
 import Icon from "../../../images/man.png";
+import axios from "../../../types/axios";
+import { user } from "../../../types/user";
+import { ToastContainer, toast } from "react-toastify";
+import moment from "moment";
 
 function Dashboard() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
+
+  const [allUsers, setAllUsers] = useState<user[]>([]);
+
+  const users = useCallback(() => {
+    axios
+      .get(`api/user/all`)
+      .then((res) => {
+        console.log("Response", res.data);
+        setAllUsers(res.data);
+      })
+      .catch(() => toast.error("Error loading data"));
+  }, []);
+
+  useEffect(() => {
+    users();
+  }, []);
+
+  function TotalStudents(){
+    var filterData = allUsers.filter((user : user) => user.isStudent === true);
+    return filterData.length;
+  }
+
+  function TotalLecturers(){
+    var filterData = allUsers.filter((user : user) => user.isLecturer === true);
+    return filterData.length;
+  }
+
+  function TotalAdmins(){
+    var filterData = allUsers.filter((user : user) => user.isAdministrator === true);
+    return filterData.length;
+  }
+
+  function GetDate(dateJoined : any){
+    var date = moment(dateJoined).format(
+      "YYYY-MM-DD"
+    );
+    return date;
+  }
 
   return (
     <div
@@ -86,10 +126,6 @@ function Dashboard() {
             className="uil uil-list-ul sidebar-toggle"
             onClick={() => setSideNavToggle(!sideNavToggle)}
           />
-          <div className="search-box">
-            <i className="uil uil-search" />
-            <input type="text" placeholder="Search here..." />
-          </div>
           <img src={Icon} alt="" />
         </div>
         <div className="dash-content">
@@ -100,30 +136,65 @@ function Dashboard() {
             </div>
             <div className="boxes">
               <div className="box box1">
-              <i className="uil uil-user"/>
-                <span className="text">
-                  Total Users
-                </span>
-                <span className="number">50,120</span>
+                <i className="uil uil-user" />
+                <span className="text">Admins</span>
+                <span className="number">{TotalAdmins()}</span>
               </div>
               <div className="box box2">
-              <i className="uil uil-book-reader"/>
-                <span className="text">
-                  Total Students
-                </span>
-                <span className="number">50,120</span>
+                <i className="uil uil-book-reader" />
+                <span className="text">Students</span>
+                <span className="number">{TotalStudents()}</span>
               </div>
               <div className="box box3">
-              <i className="uil uil-user-md"/>
-                <span className="text">
-                  Total Lecturers
-                </span>
-                <span className="number">50,120</span>
+                <i className="uil uil-user-md" />
+                <span className="text">Lecturers</span>
+                <span className="number">{TotalLecturers()}</span>
               </div>
             </div>
           </div>
+          <div className="activity">
+            <div className="title">
+              <i className="uil uil-stopwatch" />
+              <span className="text">Users</span>
+            </div>
+            <div className="activity-data">
+            <div className="data status">
+            <span className="data-title"># Id</span>
+              {allUsers.map((x: user) => {
+                  return <span className="data-list">{x.idNo}</span>
+                })}
+              </div>
+              <div className="data names">
+                <span className="data-title">Name</span>
+                {allUsers.map((x: user) => {
+                  return <span className="data-list">{x.firstName} {x.lastName}</span>
+                })}
+              </div>
+              <div className="data email">
+                <span className="data-title">Email</span>
+                {allUsers.map((x: user) => {
+                  return <span className="data-list">{x.email}</span>
+                })}
+              </div>
+              <div className="data joined">
+                <span className="data-title">Date Joined</span>
+                {allUsers.map((x: user) => {
+                  return <span className="data-list">{GetDate(x.dateJoined)}</span>
+                })}
+              </div>
+              <div className="data type">
+                <span className="data-title">Location</span>
+                {allUsers.map((x: user) => {
+                  return <span className="data-list">{x.city}</span>
+                })}
+              </div>
+             
+            </div>
+           
+          </div>
         </div>
       </section>
+      <ToastContainer />
     </div>
   );
 }
