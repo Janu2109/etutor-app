@@ -13,8 +13,6 @@ import { login } from "../../redux/slice/userSlice";
 import { RootState } from "../../redux/store";
 
 function Login({ setView }: { setView: Dispatch<SetStateAction<number>> }) {
-  const user : user[] = useSelector((state: RootState) => state.user.value);
-  console.log(user);
 
   const navigate = useNavigate();
 
@@ -37,8 +35,10 @@ function Login({ setView }: { setView: Dispatch<SetStateAction<number>> }) {
           dispatch(login(res.data.id));
           if(res.data.isAdministrator === true){
             navigate("/admin");
-          }else{
-            toast.warning("Access Denied");
+          }else if(res.data.isLecturer === true){
+            navigate('/lecturer');
+          }else if(res.data.isStudent === true){
+            navigate('/student');
           }
         })
         .catch(() => toast.error("Incorreect Login Details"));
