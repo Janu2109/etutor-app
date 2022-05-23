@@ -18,31 +18,37 @@ import {
 } from "mdb-react-ui-kit";
 import { module } from "../../../types/module";
 import { lecture } from "../../../types/lecture";
+import { user } from "../../../types/user";
 
 function Modules() {
   const [basicModal, setBasicModal] = useState(false);
 
-  const [lectureFirstName, setLectureFirstName] = useState<string>('');
+  const [addName, setAddName] = useState<string>("");
+
+  const [updateSelectedModuleId, setUpdateSelectedModuleId] =
+    useState<number>(0);
+
+  const [addDesc, setAddDesc] = useState<string>("");
+
+  const [addLecture, setAddLecture] = useState<number>(0);
+
+  const [addCourse, setAddCourse] = useState<number>(0);
 
   const toggleShow = () => setBasicModal(!basicModal);
 
   const navigate = useNavigate();
 
-  const [lecturer, setLecturer] = useState<lecture[]>([]);
+  const [courses, setCourses] = useState<course[]>([]);
 
-  const [selectedCourseId, setSelectedCourseId] = useState<number>(0);
+  const [lectures, setLectures] = useState<user[]>([]);
 
-  const [updateName, setUpdateName] = useState<string>('');
+  const [updateName, setUpdateName] = useState<string>("");
 
-  const [updateDuration, setUpdateDuration] = useState<string>('');
+  const [updateDescription, setUpdateDescription] = useState<string>("");
 
-  const [updateDescription, setUpdateDescription] = useState<string>('');
+  const [updateLecture, setUpdateLecture] = useState<number>(0);
 
-  const [addName, setAddName] = useState<string>("");
-
-  const [addDuration, setAddDuration] = useState<string>("");
-
-  const [addDescription, setAddDescription] = useState<string>("");
+  const [updateCourse, setUpdateCourse] = useState<number>(0);
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
@@ -54,84 +60,91 @@ function Modules() {
     axios
       .get(`api/module/select`)
       .then((res) => {
-        console.log("Response", res.data);
         setModules(res.data);
       })
       .catch(() => toast.error("Error loading data"));
   }, []);
 
+  const getCourses = useCallback(() => {
+    axios
+      .get(`api/course/select`)
+      .then((res) => {
+        setCourses(res.data);
+      })
+      .catch(() => toast.error("Error loading data"));
+  }, []);
+
+  const getLecturers = useCallback(() => {
+    axios
+      .get(`api/user/lecturers`)
+      .then((res) => {
+        setLectures(res.data);
+      })
+      .catch(() => {
+        toast.error("Error Fetching Users");
+      });
+  }, []);
+
   useEffect(() => {
     getModules();
+    getCourses();
+    getLecturers();
   }, []);
 
   function Redirect(url: string) {
     navigate(url);
   }
 
-  function InsertCourse() {
-    if (addDescription === "" || addDuration === "" || addName === "") {
-      toast.error("All fields are required");
-    } else {
-      axios
-        .post(
-          `api/course/new?name=${addName}&description=${addDescription}&duration=${addDuration}`
-        )
-        .then(() => {
-          toast.success("Course Added");
-          getModules();
-        })
-        .catch(() => {
-          toast.error("Error Adding Course");
-        });
-    }
-  }
-
-  function DeleteCourse(id: number) {
+  function InsertModule() {
     axios
-      .delete(`api/course/delete?id=${id}`)
+      .post(
+        `api/module/new?name=${addName}&description=${addDesc}&lectureId=${addLecture}&courseId=${addCourse}`
+      )
       .then(() => {
-        toast.success("Course Deleted");
+        toast.success("New module added");
         getModules();
       })
       .catch(() => {
-        toast.error("Error Deleting Course");
+        toast.error("Error adding module");
       });
   }
 
-  function EditCourseModal(x: module) {
-    // setUpdateName(x.name);
-    // setUpdateDescription(x.description);
-    // setUpdateDuration(x.duration)
-    // setSelectedCourseId(x.id);
-    // toggleShow();
+  function DeleteModule(x: number) {
+    axios
+      .delete(`api/module/delete?moduleId=${x}`)
+      .then(() => {
+        toast.success("Module deleted");
+        getModules();
+      })
+      .catch(() => {
+        toast.error("Error deleting module");
+      });
   }
 
-  function EditCourse(){
+  function EditModuleModal(x: module) {
+    setUpdateName(x.name);
+    setUpdateDescription(x.description);
+    setUpdateSelectedModuleId(x.id);
+    setUpdateCourse(x.courseId);
+    setUpdateLecture(x.lectureId);
+    toggleShow();
+  }
+
+  function UpdateModule() {
     axios
-      .put(`api/course/update?id=${selectedCourseId}&name=${updateName}&duration=${updateDuration}&description=${updateDescription}`)
+      .put(
+        `api/module/update?moduleId=${updateSelectedModuleId}&name=${updateName}&description=${updateDescription}&lectureId=${updateLecture}&courseId=${updateCourse}`
+      )
       .then(() => {
-        toast.success("Course Updated");
+        toast.success("Module updated");
+        getModules();
         toggleShow();
-        getModules();
       })
       .catch(() => {
-        toast.error("Error Updating Course");
+        toast.error("Error updating module");
       });
   }
-  
-  function GetLecture(id: number){
-      var lectureDetails = '';
-    axios
-    .get(`api/user/lecture?id=${id}`)
-    .then((res) => {
-      console.log(res.data[0].firstName);
-      lectureDetails = res.data[0].firstName + res.data[0].lastName;
-    })
-    .catch(() => {
-      toast.error("Error Updating Course");
-    });
-    return lectureDetails;
-  }
+
   return (
     <div
       className={
@@ -246,30 +259,60 @@ function Modules() {
                         onClick={toggleShow}
                       ></MDBBtn>
                     </MDBModalHeader>
-                    <MDBModalBody> <input
-                  onChange={(e) => setUpdateName(e.currentTarget.value)}
-                  type="text"
-                  className="form-control"
-                  placeholder={updateName}
-                />
-                <br />
-                <input
-                  onChange={(e) => setUpdateDuration(e.currentTarget.value)}
-                  type="text"
-                  className="form-control"
-                  placeholder={updateDuration}
-                />
-                <br />
-                <textarea
-                  onChange={(e) => setUpdateDescription(e.currentTarget.value)}
-                  className="form-control"
-                  id="exampleFormControlTextarea1"
-                  placeholder={updateDescription}
-                  rows={3}
-                /></MDBModalBody>
+                    <MDBModalBody>
+                      {" "}
+                      <input
+                        onChange={(e) => setUpdateName(e.currentTarget.value)}
+                        type="text"
+                        className="form-control"
+                        placeholder={updateName}
+                      />
+                      <br />
+                      <textarea
+                        onChange={(e) =>
+                          setUpdateDescription(e.currentTarget.value)
+                        }
+                        className="form-control"
+                        id="exampleFormControlTextarea1"
+                        placeholder={updateDescription}
+                        rows={3}
+                      />
+                      <br />
+                      <select
+                        className="form-control"
+                        onChange={(e) =>
+                          setUpdateLecture(parseInt(e.currentTarget.value))
+                        }
+                      >
+                        <option disabled={false}>--Select Lecture--</option>
+                        {lectures.map((x: user) => {
+                          return (
+                            <option value={x.id}>
+                              {x.firstName} {x.lastName}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <br />
+                      <select
+                        className="form-control"
+                        onChange={(e) =>
+                          setUpdateCourse(parseInt(e.currentTarget.value))
+                        }
+                      >
+                        <option disabled={false}>--Select Course--</option>
+                        {courses.map((x: course) => {
+                          return <option value={x.id}>{x.name}</option>;
+                        })}
+                      </select>
+                    </MDBModalBody>
 
                     <MDBModalFooter>
-                      <button onClick={() => EditCourse()} type="button" className="btn btn-primary">
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => UpdateModule()}
+                      >
                         <i className="uil uil-pen" /> Edit
                       </button>
                     </MDBModalFooter>
@@ -292,20 +335,20 @@ function Modules() {
                       <tr>
                         <td>{x.name}</td>
                         <td>{x.description}</td>
-                        <td>{GetLecture(x.lectureId)}</td>
+                        <td>{x.lectureId}</td>
                         <td>{x.courseId}</td>
                         <td>
                           <button
-                            onClick={() => EditCourseModal(x)}
+                            onClick={() => EditModuleModal(x)}
                             type="button"
                             className="btn btn-info"
                           >
                             <i className="uil uil-pen" />
                           </button>
                           <button
-                            onClick={() => DeleteCourse(x.id)}
                             type="button"
                             className="btn btn-danger"
+                            onClick={() => DeleteModule(x.id)}
                           >
                             <i className="uil uil-trash-alt" />
                           </button>
@@ -329,35 +372,55 @@ function Modules() {
             <div className="row">
               <div className="col">
                 <input
-                  onChange={(e) => setAddName(e.currentTarget.value)}
                   type="text"
                   className="form-control"
                   placeholder="Name"
+                  onChange={(e) => setAddName(e.currentTarget.value)}
                 />
                 <br />
                 <input
-                  onChange={(e) => setAddDuration(e.currentTarget.value)}
                   type="text"
                   className="form-control"
-                  placeholder="Duration"
+                  placeholder="Description"
+                  onChange={(e) => setAddDesc(e.currentTarget.value)}
                 />
                 <br />
                 <button
-                  onClick={() => InsertCourse()}
                   type="button"
                   className="btn btn-primary"
+                  onClick={() => InsertModule()}
                 >
                   <i className="uil uil-plus" /> Add Record
                 </button>
               </div>
               <div className="col">
-                <textarea
-                  onChange={(e) => setAddDescription(e.currentTarget.value)}
+                <select
                   className="form-control"
-                  id="exampleFormControlTextarea1"
-                  placeholder="Description"
-                  rows={3}
-                />
+                  onChange={(e) =>
+                    setAddLecture(parseInt(e.currentTarget.value))
+                  }
+                >
+                  <option disabled={false}>--Select Lecture--</option>
+                  {lectures.map((x: user) => {
+                    return (
+                      <option value={x.id}>
+                        {x.firstName} {x.lastName}
+                      </option>
+                    );
+                  })}
+                </select>
+                <br />
+                <select
+                  className="form-control"
+                  onChange={(e) =>
+                    setAddCourse(parseInt(e.currentTarget.value))
+                  }
+                >
+                  <option disabled={false}>--Select Course--</option>
+                  {courses.map((x: course) => {
+                    return <option value={x.id}>{x.name}</option>;
+                  })}
+                </select>
               </div>
             </div>
           </form>
