@@ -6,11 +6,9 @@ import uiImg from "../../images/ui.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "../../types/axios";
-import { user } from "../../types/user";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../redux/slice/userSlice";
-import { RootState } from "../../redux/store";
 
 function Login({ setView }: { setView: Dispatch<SetStateAction<number>> }) {
 
@@ -34,7 +32,7 @@ function Login({ setView }: { setView: Dispatch<SetStateAction<number>> }) {
         .then((res) => {
           dispatch(login(res.data.id));
           if(res.data.isAdministrator === true){
-            navigate("/admin");
+            navigate("/admin/dashboard");
           }else if(res.data.isLecturer === true){
             navigate('/lecturer');
           }else if(res.data.isStudent === true){

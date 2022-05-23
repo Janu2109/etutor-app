@@ -6,8 +6,11 @@ import axios from "../../../types/axios";
 import { user } from "../../../types/user";
 import { ToastContainer, toast } from "react-toastify";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
+  const navigate = useNavigate();
+
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
@@ -50,6 +53,10 @@ function Dashboard() {
     return date;
   }
 
+  function Redirect(url : string){
+    navigate(url);
+  }
+
   return (
     <div
       className={
@@ -65,31 +72,43 @@ function Dashboard() {
         </div>
         <div className="menu-items">
           <ul className="nav-links">
-            <li>
+            <li onClick={() => Redirect('/admin/dashboard')}>
               <a href="#">
                 <i className="uil uil-estate" />
                 <span className="link-name">Dashboard</span>
               </a>
             </li>
-            <li>
+            <li onClick={() => Redirect('/admin/reporting')}>
               <a href="#">
                 <i className="uil uil-file-download-alt" />
                 <span className="link-name">Reporting</span>
               </a>
             </li>
-            <li>
+            <li onClick={() => Redirect('/admin/analytics')}>
               <a href="#">
                 <i className="uil uil-chart-line" />
                 <span className="link-name">Analytics</span>
               </a>
             </li>
-            <li>
+            <li onClick={() => Redirect('/admin/courses')}>
               <a href="#">
                 <i className="uil uil-edit" />
-                <span className="link-name">Manage</span>
+                <span className="link-name">Manage Courses</span>
               </a>
             </li>
-            <li>
+            <li onClick={() => Redirect("/admin/modules")}>
+              <a href="#">
+                <i className="uil uil-book-open" />
+                <span className="link-name">Manage Modules</span>
+              </a>
+            </li>
+            <li onClick={() => Redirect('/admin/users')}>
+              <a href="#">
+                <i className="uil uil-user" />
+                <span className="link-name">Manage Users</span>
+              </a>
+            </li>
+            <li onClick={() => Redirect('/admin/communication')}>
               <a href="#">
                 <i className="uil uil-comments-alt" />
                 <span className="link-name">Communication</span>
@@ -97,7 +116,7 @@ function Dashboard() {
             </li>
           </ul>
           <ul className="logout-mod">
-            <li>
+            <li onClick={() => Redirect('/')}>
               <a href="#">
                 <i className="uil uil-signout" />
                 <span className="link-name">Log Out</span>
