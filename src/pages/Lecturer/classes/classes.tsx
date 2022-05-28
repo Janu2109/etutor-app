@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { module } from "../../../types/module";
 import { useNavigate } from "react-router-dom";
+import { classes } from "../../../types/classes";
 
 function Classes() {
   const userId: user[] = useSelector((state: RootState) => state.user.value);
@@ -27,6 +28,8 @@ function Classes() {
 
   const [endTime, setEndTime] = useState<string>('');
 
+  const [classes, setClasses] = useState<classes[]>([]);
+
   const navigate = useNavigate();
 
   const lectureModules = useCallback(() => {
@@ -38,16 +41,48 @@ function Classes() {
       .catch(() => toast.error("No modules found for this user"));
   }, []);
 
+  const lectureClasses = useCallback(() => {
+    axios
+      .get(`api/classes/lecture?lectureId=${userId}`)
+      .then((res) => {
+        setClasses(res.data);
+      })
+      .catch(() => toast.warning("No classes scheduled"));
+  }, []);
+
   useEffect(() => {
     lectureModules();
+    lectureClasses();
   }, []);
 
   function AddClass() {
-    
+    axios
+      .post(`api/classes/insert?lectureId=${userId}&moduleId=${module}&day=${day}&startTime=${startTime}&endTime=${endTime}`)
+      .then(() => {
+        toast.success('Class scheduled');
+        lectureClasses();
+      })
+      .catch(() => toast.error("All fields are required"));
+  }
+
+  function DeleteClass(classId: number){
+    axios
+      .delete(`api/classes/delete?classId=${classId}`)
+      .then(() => {
+        toast.success('Class deleted');
+        lectureClasses();
+      })
+      .catch(() => toast.error("Error"));
   }
 
   function Redirect(url: string) {
     navigate(url);
+  }
+
+  function ReturnModule(x: classes){
+    var result: module[] = modules.filter((y: module) => y.id === x.moduleId)
+    console.log(result);
+      return result[0].name;
   }
 
   return (
@@ -149,7 +184,41 @@ function Classes() {
               <span className="text">My Classes</span>
             </div>
             <hr />
-            <i>No classes for this user</i>
+            {classes.length === 0 ? <i>No classes for this user</i> : <table className="table table-striped course-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Module</th>
+                    <th scope="col">Day</th>
+                    <th scope="col">Start</th>
+                    <th scope="col">End</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {classes.map((x: classes) => {
+                    return (
+                      <tr>
+                        <td>{x.id}</td>
+                        <td>{ReturnModule(x)}</td>
+                        <td>{x.day}</td>
+                        <td>{x.timeStart}</td>
+                        <td>{x.timeEnd}</td>
+                        <td>
+                          
+                          <button
+                            type="button"
+                            className="btn btn-danger"
+                           onClick={() => DeleteClass(x.id)}
+                          >
+                            <i className="uil uil-trash-alt" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>}
           </div>
           <div className="activity">
             <hr />
@@ -161,7 +230,7 @@ function Classes() {
             <div className="activity-data-classes-lecture">
               <div className="col">
                 <h5>Class Day</h5>
-                <select className="form-control" id="exampleFormControlSelect1">
+                <select onChange={(e) => setDay(e.currentTarget.value)} className="form-control" id="exampleFormControlSelect1">
                   <option>-- Select --</option>
                   <option value={"Monday"}>Monday</option>
                   <option value={"Tuesday"}>Tuesday</option>
@@ -171,7 +240,7 @@ function Classes() {
                 </select>
                 <br />
                 <h5>Module</h5>
-                <select className="form-control" id="exampleFormControlSelect1">
+                <select onChange={(e) => setModule(parseInt(e.currentTarget.value))} className="form-control" id="exampleFormControlSelect1">
                  <option>-- Select --</option>
                  {modules.map((x: module) => {
                    return(
@@ -181,7 +250,7 @@ function Classes() {
                 </select>
                 <br />
                 <h5>Start Time</h5>
-                <select className="form-control" id="exampleFormControlSelect1">
+                <select onChange={(e) => setStartTime(e.currentTarget.value)} className="form-control" id="exampleFormControlSelect1">
                   <option>-- Select --</option>
                   <option value={'08:00'}>08:00</option>
                   <option value={'09:00'}>09:00</option>
@@ -194,7 +263,7 @@ function Classes() {
                 </select>
                 <br />
                 <h5>End Time</h5>
-                <select className="form-control" id="exampleFormControlSelect1">
+                <select onChange={(e) => setEndTime(e.currentTarget.value)} className="form-control" id="exampleFormControlSelect1">
                   <option>-- Select --</option>
                 <option value={'09:00'}>09:00</option>
                   <option value={'10:00'}>10:00</option>

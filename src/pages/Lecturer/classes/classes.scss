@@ -16,6 +16,20 @@ body {
   --tran-03: all 0.2s ease;
 }
 
+th{
+  color: var(--text-color);
+  
+}
+
+td{
+  color: var(--text-color) !important;
+}
+
+.btn-danger{
+ background-color: var(--primary-color);
+ border: none;
+}
+
 h5{
     color: var(--text-color);
 }
