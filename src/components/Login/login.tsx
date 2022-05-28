@@ -34,7 +34,7 @@ function Login({ setView }: { setView: Dispatch<SetStateAction<number>> }) {
           if(res.data.isAdministrator === true){
             navigate("/admin/dashboard");
           }else if(res.data.isLecturer === true){
-            navigate('/lecturer');
+            navigate('/lecturer/dashboard');
           }else if(res.data.isStudent === true){
             navigate('/student');
           }

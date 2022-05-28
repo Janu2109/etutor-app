@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import logo from "../../../images/logo.png";
-import "./dashboard.scss";
+import "./classes.scss";
 import Icon from "../../../images/man.png";
 import axios from "../../../types/axios";
 import { user } from "../../../types/user";
@@ -10,71 +10,40 @@ import { RootState } from "../../../redux/store";
 import { module } from "../../../types/module";
 import { useNavigate } from "react-router-dom";
 
-function Dashboard() {
+function Classes() {
   const userId: user[] = useSelector((state: RootState) => state.user.value);
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
-  const [modules, setModules] = useState<module[]>([]);
-
   const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
 
-  const [allModules, setAllModules] = useState<module[]>([]);
+  const [modules, setModules] = useState<module[]>([]);
 
-  const [allUsers, setAllUsers] = useState<user[]>([]);
+  const [day, setDay] = useState<string>('');
+
+  const [module, setModule] = useState<number>(0);
+
+  const [startTime, setStartTime] = useState<string>('');
+
+  const [endTime, setEndTime] = useState<string>('');
 
   const navigate = useNavigate();
 
-  const getModules = useCallback(() => {
+  const lectureModules = useCallback(() => {
     axios
       .get(`api/module/lecture/modules?lectureId=${userId}`)
       .then((res) => {
         setModules(res.data);
       })
-      .catch(() => toast.error("Error loading data"));
+      .catch(() => toast.error("No modules found for this user"));
   }, []);
 
   useEffect(() => {
-    getModules();
+    lectureModules();
   }, []);
 
-  const getAllModules = useCallback(() => {
-    axios
-      .get(`api/module/select`)
-      .then((res) => {
-        setAllModules(res.data);
-      })
-      .catch(() => toast.error("Error loading data"));
-  }, []);
-
-  useEffect(() => {
-    getAllModules();
-  }, []);
-
-  const users = useCallback(() => {
-    axios
-      .get(`api/user/all`)
-      .then((res) => {
-        console.log("Response", res.data);
-        setAllUsers(res.data);
-      })
-      .catch(() => toast.error("Error loading data"));
-  }, []);
-
-  useEffect(() => {
-    users();
-  }, []);
-
-  function MyModules() {
-    var filterData = allModules.filter(
-      (module: any) => module.lectureId === userId
-    );
-    return filterData.length;
-  }
-
-  function TotalStudents(){
-    var filterData = allUsers.filter((user : user) => user.isStudent === true);
-    return filterData.length;
+  function AddClass() {
+    
   }
 
   function Redirect(url: string) {
@@ -177,54 +146,74 @@ function Dashboard() {
           <div className="overview">
             <div className="title">
               <i className="uil uil-tachometer-fast" />
-              <span className="text">Dashboard - Lecturer</span>
+              <span className="text">My Classes</span>
             </div>
-            <div className="boxes">
-              <div className="box box1">
-                <i className="uil uil-book-open" />
-                <span className="text">Total Modules</span>
-                <span className="number">{allModules.length}</span>
-              </div>
-              <div className="box box2">
-                <i className="uil uil-cell" />
-                <span className="text">My Modules</span>
-                <span className="number">{MyModules()}</span>
-              </div>
-              <div className="box box3">
-                <i className="uil uil-user" />
-                <span className="text">Total Students</span>
-                <span className="number">{TotalStudents()}</span>
-              </div>
-            </div>
+            <hr />
+            <i>No classes for this user</i>
           </div>
           <div className="activity">
+            <hr />
             <div className="title">
-              <i className="uil uil-stopwatch" />
-              <span className="text">My Modules</span>
+              <i className="uil uil-plus" />
+              <span className="text">Create new class</span>
             </div>
-            <div className="activity-data">
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {modules.map((x: module) => {
-                    return (
-                      <>
-                        <tr>
-                          <th scope="row">{x.id}</th>
-                          <td>{x.name}</td>
-                          <td>{x.description}</td>
-                        </tr>
-                      </>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <hr />
+            <div className="activity-data-classes-lecture">
+              <div className="col">
+                <h5>Class Day</h5>
+                <select className="form-control" id="exampleFormControlSelect1">
+                  <option>-- Select --</option>
+                  <option value={"Monday"}>Monday</option>
+                  <option value={"Tuesday"}>Tuesday</option>
+                  <option value={"Wednesaday"}>Wednesaday</option>
+                  <option value={"Thursday"}>Thursday</option>
+                  <option value={"Friday"}>Friday</option>
+                </select>
+                <br />
+                <h5>Module</h5>
+                <select className="form-control" id="exampleFormControlSelect1">
+                 <option>-- Select --</option>
+                 {modules.map((x: module) => {
+                   return(
+                     <option value={x.id}>{x.name}</option>
+                   )
+                 })}
+                </select>
+                <br />
+                <h5>Start Time</h5>
+                <select className="form-control" id="exampleFormControlSelect1">
+                  <option>-- Select --</option>
+                  <option value={'08:00'}>08:00</option>
+                  <option value={'09:00'}>09:00</option>
+                  <option value={'10:00'}>10:00</option>
+                  <option value={'11:00'}>11:00</option>
+                  <option value={'12:00'}>12:00</option>
+                  <option value={'13:00'}>13:00</option>
+                  <option value={'14:00'}>14:00</option>
+                  <option value={'15:00'}>15:00</option>
+                </select>
+                <br />
+                <h5>End Time</h5>
+                <select className="form-control" id="exampleFormControlSelect1">
+                  <option>-- Select --</option>
+                <option value={'09:00'}>09:00</option>
+                  <option value={'10:00'}>10:00</option>
+                  <option value={'11:00'}>11:00</option>
+                  <option value={'12:00'}>12:00</option>
+                  <option value={'13:00'}>13:00</option>
+                  <option value={'14:00'}>14:00</option>
+                  <option value={'15:00'}>15:00</option>
+                  <option value={'16:00'}>16:00</option>
+                </select>
+                <br />
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => AddClass()}
+                >
+                  <i className="uil uil-plus" /> Add Record
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -234,4 +223,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default Classes;

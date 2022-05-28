@@ -6,6 +6,8 @@ import LectureDashboard from './pages/Lecturer/Dashboard/dashboard';
 import StudentDashboard from './pages/student/dashboard/dashboard';
 import AdminCourses from './pages/admin/courses/courses';
 import AdminModules from './pages/admin/modules/modules';
+import AdminUsers from './pages/admin/users/users';
+import LectureClasses from './pages/Lecturer/classes/classes';
 
 function App() {
   return (
@@ -17,7 +19,7 @@ function App() {
         <Route path="/admin/dashboard" element={<Dashboard />} />
       </Routes>
       <Routes>
-        <Route path="/lecturer" element={<LectureDashboard />} />
+        <Route path="/lecturer/dashboard" element={<LectureDashboard />} />
       </Routes>
       <Routes>
         <Route path="/student" element={<StudentDashboard />} />
@@ -27,6 +29,12 @@ function App() {
       </Routes>
       <Routes>
         <Route path="/admin/modules" element={<AdminModules />} />
+      </Routes>
+      <Routes>
+        <Route path="/admin/users" element={<AdminUsers />} />
+      </Routes>
+      <Routes>
+        <Route path="/lecture/classes" element={<LectureClasses />} />
       </Routes>
      </BrowserRouter>
   );
