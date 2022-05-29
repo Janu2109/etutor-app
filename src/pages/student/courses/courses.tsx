@@ -1,30 +1,25 @@
 import { useCallback, useEffect, useState } from "react";
 import logo from "../../../images/logo.png";
-import "./dashboard.scss";
+import "./courses.scss";
 import Icon from "../../../images/man.png";
 import axios from "../../../types/axios";
 import { user } from "../../../types/user";
 import { ToastContainer, toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
-import { module } from "../../../types/module";
 import { useNavigate } from "react-router-dom";
 import ReactPlayer from "react-player/youtube";
 import { course } from "../../../types/course";
 import { lecture } from "../../../types/lecture";
 
-function Dashboard() {
+function StudentCourses() {
   const userId: user[] = useSelector((state: RootState) => state.user.value);
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
-  const [lecturers, setLecturers] = useState<lecture[]>([]);
-
   const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
 
   const [courses, setCourses] = useState<course[]>([]);
-
-  const [users, setUsers] = useState<user[]>([]);
 
   const navigate = useNavigate();
 
@@ -38,37 +33,21 @@ function Dashboard() {
       .catch(() => toast.error("Error loading data"));
   }, []);
 
-  const lecturer = useCallback(() => {
-    axios
-      .get(`api/user/lecturers`)
-      .then((res) => {
-        setLecturers(res.data);
-      })
-      .catch(() => toast.error("Error loading data"));
-  }, []);
-
-  const getStudent = useCallback(() => {
-    axios
-      .get(`api/user/all`)
-      .then((res) => {
-        setUsers(res.data);
-      })
-      .catch(() => toast.error("Error loading data"));
-  }, []);
-
   useEffect(() => {
     course();
-    lecturer();
-    getStudent();
   }, []);
-
-  function StudentCount(){
-    var total: any[] = users.filter((x: user) => x.isStudent === true);
-    return total.length;
-  }
 
   function Redirect(url: string) {
     navigate(url);
+  }
+
+  function Enroll(courseId: number){
+        axios
+          .post(`api/enrollment/register?userId=${userId}&courseId=${courseId}`)
+          .then((res) => {
+            toast.success('You are now enrolled!');
+          })
+          .catch(() => toast.error("Something went wrong"));
   }
 
   return (
@@ -132,6 +111,12 @@ function Dashboard() {
             </li>
           </ul>
           <ul className="logout-mod">
+          <li onClick={() => Redirect("/student/profile")}>
+              <a href="#">
+                <i className="uil uil-user-circle" />
+                <span className="link-name">Profile</span>
+              </a>
+            </li>
             <li onClick={() => Redirect("/")}>
               <a href="#">
                 <i className="uil uil-signout" />
@@ -167,34 +152,49 @@ function Dashboard() {
           <div className="overview">
             <div className="title">
               <i className="uil uil-tachometer-fast" />
-              <span className="text">Dashboard - Student</span>
+              <span className="text">Course Enrollment</span>
             </div>
             <div className="boxes">
-              <div className="box box1">
-                <i className="uil uil-book" />
-                <span className="text">Total Courses</span>
-                <span className="number">{courses.length}</span>
-              </div>
-              <div className="box box2">
-                <i className="uil uil-user-md" />
-                <span className="text">Total Lecturers</span>
-                <span className="number">{lecturers.length}</span>
-              </div>
-              <div className="box box3">
-                <i className="uil uil-book-open" />
-                <span className="text">Students Enrolled</span>
-                <span className="number">{StudentCount()}</span>
-              </div>
+            <table className="table table-striped course-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {courses.map((x: course) => {
+                    return (
+                      <tr>
+                        <td>{x.name}</td>
+                        <td>{x.description}</td>
+                        <td>{x.duration}</td>
+                        <td>
+                         
+                          <button
+                            type="button"
+                            className="btn btn-success"
+                            onClick={() => Enroll(x.id)}
+                          >
+                            Enroll
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
           <div className="activity">
             <div className="title">
               <i className="uil uil-play" />
-              <span className="text">Online Learning Intro</span>
+              <span className="text">Why Enrol?</span>
             </div>
             <div className="activity-data">
               {/* Video player here */}
-              <ReactPlayer url={'https://www.youtube.com/watch?v=1SZle1skb84'} width={'5000px'} height={'600px'} controls={true}/>
+              <ReactPlayer url={'https://www.youtube.com/watch?v=HndV87XpkWg'} width={'5000px'} height={'600px'} controls={true}/>
             </div>
           </div>
         </div>
@@ -204,4 +204,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default StudentCourses;
