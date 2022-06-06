@@ -9,6 +9,8 @@ import AdminModules from './pages/admin/modules/modules';
 import AdminUsers from './pages/admin/users/users';
 import LectureClasses from './pages/Lecturer/classes/classes';
 import StudentCourses from "./pages/student/courses/courses";
+import AdminAnalytics from "./pages/admin/analytics/analytics";
+import AdminReporting from "./pages/admin/reporting/reporting";
 
 function App() {
   return (
@@ -39,6 +41,12 @@ function App() {
       </Routes>
       <Routes>
         <Route path="/student/courses" element={<StudentCourses />} />
+      </Routes>
+      <Routes>
+        <Route path="/admin/analytics" element={<AdminAnalytics />} />
+      </Routes>
+      <Routes>
+        <Route path="/admin/reporting" element={<AdminReporting />} />
       </Routes>
      </BrowserRouter>
   );

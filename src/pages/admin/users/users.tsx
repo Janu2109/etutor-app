@@ -86,12 +86,13 @@ function Users() {
 
   function DeleteUser(x: number) {
     axios
-      .delete(`api/module/delete?moduleId=${x}`)
+      .delete(`api/user/remove?userId=${x}`)
       .then(() => {
-        toast.success("Module deleted");
+        toast.success("User deleted");
+        getUsers();
       })
       .catch(() => {
-        toast.error("Error deleting module");
+        toast.error("Error deleting user");
       });
   }
 
