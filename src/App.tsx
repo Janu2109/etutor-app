@@ -11,6 +11,11 @@ import LectureClasses from './pages/Lecturer/classes/classes';
 import StudentCourses from "./pages/student/courses/courses";
 import AdminAnalytics from "./pages/admin/analytics/analytics";
 import AdminReporting from "./pages/admin/reporting/reporting";
+import LectureFiles from "./pages/Lecturer/files/files";
+import LectureReporting from "./pages/Lecturer/reporting/reporting";
+import LectureAnalytics from "./pages/Lecturer/analytics/analytics";
+import LectureAttendance from "./pages/Lecturer/Attendance/attendance";
+import LectureAssessments from "./pages/Lecturer/Assessments/assessments";
 
 function App() {
   return (
@@ -47,6 +52,21 @@ function App() {
       </Routes>
       <Routes>
         <Route path="/admin/reporting" element={<AdminReporting />} />
+      </Routes>
+      <Routes>
+        <Route path="/lecture/files" element={<LectureFiles />} />
+      </Routes>
+      <Routes>
+        <Route path="/lecture/reporting" element={<LectureReporting />} />
+      </Routes>
+      <Routes>
+        <Route path="/lecture/analytics" element={<LectureAnalytics />} />
+      </Routes>
+      <Routes>
+        <Route path="/lecture/attendance" element={<LectureAttendance />} />
+      </Routes>
+      <Routes>
+        <Route path="/lecture/assessments" element={<LectureAssessments />} />
       </Routes>
      </BrowserRouter>
   );

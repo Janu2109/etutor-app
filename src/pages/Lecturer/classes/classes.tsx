@@ -126,6 +126,12 @@ function Classes() {
                 <span className="link-name">Assessments</span>
               </a>
             </li>
+            <li onClick={() => Redirect("/lecture/files")}>
+              <a href="#">
+                <i className="uil uil-upload" />
+                <span className="link-name">Upload Files</span>
+              </a>
+            </li>
             <li onClick={() => Redirect("/lecture/classes")}>
               <a href="#">
                 <i className="uil uil-hourglass" />

@@ -1,92 +1,173 @@
 import { useCallback, useEffect, useState } from "react";
 import logo from "../../../images/logo.png";
-import "./dashboard.scss";
+import "./analytics.scss";
 import Icon from "../../../images/man.png";
 import axios from "../../../types/axios";
-import { user } from "../../../types/user";
 import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { course } from "../../../types/course";
+import { module } from "../../../types/module";
+import ReactECharts from 'echarts-for-react';
+import { title } from "process";
+import { user } from "../../../types/user";
+import ReactPlayer from "react-player";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
-import { module } from "../../../types/module";
-import { useNavigate } from "react-router-dom";
 
-function Dashboard() {
-  const userId: user[] = useSelector((state: RootState) => state.user.value);
-
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-
-  const [modules, setModules] = useState<module[]>([]);
-
-  const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
-
-  const [allModules, setAllModules] = useState<module[]>([]);
-
-  const [allUsers, setAllUsers] = useState<user[]>([]);
+function LectureAnalytics() {
+  const [basicModal, setBasicModal] = useState(false);
 
   const navigate = useNavigate();
 
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+
+  const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
+
+  const [courses, setCourses] = useState<course[]>([]);
+
+  const [modules, setModules] = useState<module[]>([]);
+
+  const [myModules, setMyModules] = useState<module[]>([]);
+
+  const [users, setUsers] = useState<user[]>([]);
+
+  const getCourses = useCallback(() => {
+    axios
+      .get(`api/course/select`)
+      .then((res) => {
+        setCourses(res.data);
+      })
+      .catch(() => toast.error("Error loading data"));
+  }, []);
+
+  const getUsers = useCallback(() => {
+    axios
+      .get(`api/user/all`)
+      .then((res) => {
+        setUsers(res.data);
+      })
+      .catch(() => toast.error("Error loading data"));
+  }, []);
+
+  var students = users.filter((x: user) => x.isStudent === true);
+
+  var lecturers = users.filter((x: user) => x.isLecturer === true);
+
+  var admins = users.filter((x: user) => x.isAdministrator === true);
+
+  const userId: user[] = useSelector((state: RootState) => state.user.value);
+
   const getModules = useCallback(() => {
     axios
-      .get(`api/module/lecture/modules?lectureId=${userId}`)
+      .get(`api/module/select`)
       .then((res) => {
         setModules(res.data);
       })
       .catch(() => toast.error("Error loading data"));
   }, []);
 
+  const getMyModules = useCallback(() => {
+    axios
+      .get(`api/module/lecture/modules?lectureId=${userId}`)
+      .then((res) => {
+        setMyModules(res.data);
+      })
+      .catch(() => toast.error("Error loading data"));
+  }, []);
+
   useEffect(() => {
+    getCourses();
     getModules();
+    getUsers();
+    getMyModules();
   }, []);
-
-  const getAllModules = useCallback(() => {
-    axios
-      .get(`api/module/select`)
-      .then((res) => {
-        setAllModules(res.data);
-      })
-      .catch(() => toast.error("Error loading data"));
-  }, []);
-
-  useEffect(() => {
-    getAllModules();
-  }, []);
-
-  const users = useCallback(() => {
-    axios
-      .get(`api/user/all`)
-      .then((res) => {
-        console.log("Response", res.data);
-        setAllUsers(res.data);
-      })
-      .catch(() => toast.error("Error loading data"));
-  }, []);
-
-  useEffect(() => {
-    users();
-  }, []);
-
-  function MyModules() {
-    var filterData = allModules.filter(
-      (module: any) => module.lectureId === userId
-    );
-    return filterData.length;
-  }
-
-  function TotalStudents(){
-    var filterData = allUsers.filter((user : user) => user.isStudent === true);
-    return filterData.length;
-  }
 
   function Redirect(url: string) {
     navigate(url);
+  }
+
+  const courseOptions = {
+    darkMode: 'auto',
+    tooltip: {
+      trigger: 'item'
+    },
+    legend: {
+      top: '0%',
+      left: 'center'
+    },
+    series: [
+      {
+        height: '300',
+        name: 'Modules Overview',
+        type: 'pie',
+        radius: ['50%', '80%'],
+        avoidLabelOverlap: false,
+        label: {
+          show: false,
+          position: 'center'
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: '40',
+            fontWeight: 'bold'
+          }
+        },
+        labelLine: {
+          show: false
+        },
+        data: [
+          { value: myModules.length, name: 'My Modules' },
+          { value: modules.length, name: 'Modules' }
+        ]
+      }
+    ]
+  }
+
+  const usersOptions = {
+    tooltip: {
+      trigger: 'item'
+    },
+    legend: {
+      top: '0%',
+      left: 'center'
+    },
+    series: [
+      {
+        height: '300',
+        name: 'Users',
+        type: 'pie',
+        radius: ['50%', '80%'],
+        avoidLabelOverlap: false,
+        label: {
+          show: false,
+          position: 'center'
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: '40',
+            fontWeight: 'bold'
+          }
+        },
+        labelLine: {
+          show: false
+        },
+        data: [
+          { value: students.length, name: 'Students' },
+          { value: lecturers.length, name: 'Lecturers' },
+          { value: admins.length, name: 'Admins'}
+        ]
+      }
+    ]
   }
 
   return (
     <div
       className={
         isDarkMode
-          ? "lecture-dash-container dark-mode"
-          : "lecture-dash-container"
+          ? "admin-courses-container dark-mode"
+          : "admin-courses-container"
       }
     >
       <nav id="lectureNav" className={sideNavToggle ? "" : "nav-closed"}>
@@ -179,59 +260,22 @@ function Dashboard() {
           />
           <img src={Icon} alt="" />
         </div>
-        <div className="dash-content">
+        <div className="dash-content-analytics">
           <div className="overview">
             <div className="title">
               <i className="uil uil-tachometer-fast" />
-              <span className="text">Dashboard - Lecturer</span>
-            </div>
-            <div className="boxes">
-              <div className="box box1">
-                <i className="uil uil-book-open" />
-                <span className="text">Total Modules</span>
-                <span className="number">{allModules.length}</span>
-              </div>
-              <div className="box box2">
-                <i className="uil uil-cell" />
-                <span className="text">My Modules</span>
-                <span className="number">{MyModules()}</span>
-              </div>
-              <div className="box box3">
-                <i className="uil uil-user" />
-                <span className="text">Total Students</span>
-                <span className="number">{TotalStudents()}</span>
-              </div>
+              <span className="text">Analytics</span>
             </div>
           </div>
-          <div className="activity">
-            <div className="title">
-              <i className="uil uil-stopwatch" />
-              <span className="text">My Modules</span>
-            </div>
-            <div className="activity-data">
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {modules.map((x: module) => {
-                    return (
-                      <>
-                        <tr>
-                          <th scope="row">{x.id}</th>
-                          <td>{x.name}</td>
-                          <td>{x.description}</td>
-                        </tr>
-                      </>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+          <hr />
+          <div className="left">
+          <ReactECharts option={courseOptions}/>
+          </div>
+          <div className="right">
+          <ReactECharts option={usersOptions}/>
+          </div>
+          <div className="left">
+          <ReactPlayer url={'https://www.youtube.com/watch?v=59SFeXcRpLE'} width={'200%'} height={'600px'} controls={true}/>
           </div>
         </div>
       </section>
@@ -240,4 +284,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default LectureAnalytics;

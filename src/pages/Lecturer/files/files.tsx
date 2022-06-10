@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import logo from "../../../images/logo.png";
-import "./dashboard.scss";
+import "./files.scss";
 import Icon from "../../../images/man.png";
 import axios from "../../../types/axios";
 import { user } from "../../../types/user";
@@ -9,76 +9,90 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { module } from "../../../types/module";
 import { useNavigate } from "react-router-dom";
+import { classes } from "../../../types/classes";
+import { files } from "../../../types/files";
 
-function Dashboard() {
+function LectureFiles() {
   const userId: user[] = useSelector((state: RootState) => state.user.value);
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
-  const [modules, setModules] = useState<module[]>([]);
-
   const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
 
-  const [allModules, setAllModules] = useState<module[]>([]);
+  const [modules, setModules] = useState<module[]>([]);
 
-  const [allUsers, setAllUsers] = useState<user[]>([]);
+  const [module, setModule] = useState<number>(0);
+
+  const [classes, setClasses] = useState<classes[]>([]);
+
+  const [pdfName, setPdfName] = useState<string>('');
+
+  const [files, setFiles] = useState<files[]>([]);
 
   const navigate = useNavigate();
 
-  const getModules = useCallback(() => {
+  const lectureModules = useCallback(() => {
     axios
       .get(`api/module/lecture/modules?lectureId=${userId}`)
       .then((res) => {
         setModules(res.data);
       })
-      .catch(() => toast.error("Error loading data"));
+      .catch(() => toast.error("No modules found for this user"));
   }, []);
 
-  useEffect(() => {
-    getModules();
-  }, []);
-
-  const getAllModules = useCallback(() => {
+  const lectureClasses = useCallback(() => {
     axios
-      .get(`api/module/select`)
+      .get(`api/classes/lecture?lectureId=${userId}`)
       .then((res) => {
-        setAllModules(res.data);
+        setClasses(res.data);
       })
-      .catch(() => toast.error("Error loading data"));
+      .catch(() => toast.warning("No classes scheduled"));
   }, []);
 
-  useEffect(() => {
-    getAllModules();
-  }, []);
-
-  const users = useCallback(() => {
+  const lectureFiles = useCallback(() => {
     axios
-      .get(`api/user/all`)
+      .get(`api/files/lecture?lectureId=${userId}`)
       .then((res) => {
-        console.log("Response", res.data);
-        setAllUsers(res.data);
+        setFiles(res.data);
       })
-      .catch(() => toast.error("Error loading data"));
+      .catch(() => toast.warning("No files found"));
   }, []);
 
   useEffect(() => {
-    users();
+    lectureModules();
+    lectureClasses();
+    lectureFiles();
   }, []);
 
-  function MyModules() {
-    var filterData = allModules.filter(
-      (module: any) => module.lectureId === userId
-    );
-    return filterData.length;
+  function AddFile() {
+    axios
+      .post(
+        `api/files/new?name=${pdfName}&moduleId=${module}&userId=${userId}`
+      )
+      .then(() => {
+        toast.success("File Uploaded");
+        lectureFiles();
+      })
+      .catch(() => toast.error("Error uploading file"));
   }
 
-  function TotalStudents(){
-    var filterData = allUsers.filter((user : user) => user.isStudent === true);
-    return filterData.length;
+  function DeleteFile(fileId: number) {
+    axios
+      .delete(`api/files/delete?fileId=${fileId}`)
+      .then(() => {
+        toast.success("File deleted");
+        lectureFiles();
+      })
+      .catch(() => toast.error("Error deleting file"));
   }
 
   function Redirect(url: string) {
     navigate(url);
+  }
+
+  function ReturnModule(x: number) {
+    var result: module[] = modules.filter((y: module) => y.id === x);
+    return result[0].name;
   }
 
   return (
@@ -182,55 +196,83 @@ function Dashboard() {
         <div className="dash-content">
           <div className="overview">
             <div className="title">
-              <i className="uil uil-tachometer-fast" />
-              <span className="text">Dashboard - Lecturer</span>
+              <i className="uil uil-plus" />
+              <span className="text">New Files</span>
             </div>
-            <div className="boxes">
-              <div className="box box1">
-                <i className="uil uil-book-open" />
-                <span className="text">Total Modules</span>
-                <span className="number">{allModules.length}</span>
-              </div>
-              <div className="box box2">
-                <i className="uil uil-cell" />
-                <span className="text">My Modules</span>
-                <span className="number">{MyModules()}</span>
-              </div>
-              <div className="box box3">
-                <i className="uil uil-user" />
-                <span className="text">Total Students</span>
-                <span className="number">{TotalStudents()}</span>
+            <hr />
+            <div className="input-group mb-3">
+              <div className="custom-file">
+                <input
+                  type="file"
+                  className="custom-file-input"
+                  id="inputGroupFile01"
+                  onChange={(e) => setPdfName(e.currentTarget.files![0].name)}
+                />
               </div>
             </div>
+            <br />
+                <h5>Module</h5>
+                <select onChange={(e) => setModule(parseInt(e.currentTarget.value))} className="form-control" id="exampleFormControlSelect1">
+                 <option>-- Select --</option>
+                 {modules.map((x: module) => {
+                   return(
+                     <option value={x.id}>{x.name}</option>
+                   )
+                 })}
+                </select>
+            <br />
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => AddFile()}
+            >
+              <i className="uil uil-upload" /> Upload File
+            </button>
           </div>
           <div className="activity">
+            <hr />
             <div className="title">
-              <i className="uil uil-stopwatch" />
-              <span className="text">My Modules</span>
+              <i className="uil uil-tachometer-fast" />
+              <span className="text">My Files</span>
             </div>
-            <div className="activity-data">
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {modules.map((x: module) => {
-                    return (
-                      <>
-                        <tr>
-                          <th scope="row">{x.id}</th>
-                          <td>{x.name}</td>
-                          <td>{x.description}</td>
-                        </tr>
-                      </>
-                    );
-                  })}
-                </tbody>
-              </table>
+
+            <hr />
+            <div className="activity-data-classes-lecture">
+              <div className="col">
+                {files.length === 0 ? (
+                  <i>No files for this user</i>
+                ) : (
+                  <table className="table table-striped course-table lecture-file-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">File Name</th>
+                        <th scope="col">Module</th>
+                        <th scope="col"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {files.map((x: files) => {
+                        return (
+                          <tr>
+                            <td>{x.name}</td>
+                            <td>{ReturnModule(x.moduleId)}</td>
+                            <td>
+                              <button
+                                type="button"
+                                className="btn btn-danger"
+                                onClick={() => DeleteFile(x.id)}
+                              >
+                                <i className="uil uil-trash-alt" />
+                              </button>
+                             
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -240,4 +282,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default LectureFiles;

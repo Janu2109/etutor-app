@@ -1,29 +1,45 @@
 import { useCallback, useEffect, useState } from "react";
 import logo from "../../../images/logo.png";
-import "./dashboard.scss";
+import "./attendance.scss";
 import Icon from "../../../images/man.png";
 import axios from "../../../types/axios";
-import { user } from "../../../types/user";
 import { ToastContainer, toast } from "react-toastify";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
-import { module } from "../../../types/module";
 import { useNavigate } from "react-router-dom";
+import { course } from "../../../types/course";
+import { module } from "../../../types/module";
+import { user } from "../../../types/user";
+import { RootState } from "../../../redux/store";
+import { useSelector } from "react-redux";
+import { addSyntheticLeadingComment } from "typescript";
 
-function Dashboard() {
+function LectureAttendance() {
   const userId: user[] = useSelector((state: RootState) => state.user.value);
+
+  const [view, setView] = useState("");
+
+  console.log(view);
+
+  const navigate = useNavigate();
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
-  const [modules, setModules] = useState<module[]>([]);
-
   const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
 
-  const [allModules, setAllModules] = useState<module[]>([]);
+  const [modules, setModules] = useState<module[]>([]);
 
-  const [allUsers, setAllUsers] = useState<user[]>([]);
+  const [courses, setCourses] = useState<course[]>([]);
 
-  const navigate = useNavigate();
+  const [courseId, setCoureId] = useState<number>(0);
+
+  const [users, setUsers] = useState<user[]>([]);
+
+  var date: Date = new Date()
+
+  var stringDate = date.toDateString();
+
+  var studentIds: any[] = [];
+
+  const [selectedModule, setSelectedModule] = useState<number>(0);
 
   const getModules = useCallback(() => {
     axios
@@ -34,59 +50,62 @@ function Dashboard() {
       .catch(() => toast.error("Error loading data"));
   }, []);
 
-  useEffect(() => {
-    getModules();
-  }, []);
-
-  const getAllModules = useCallback(() => {
+  const getCourses = useCallback(() => {
     axios
-      .get(`api/module/select`)
-      .then((res) => {
-        setAllModules(res.data);
-      })
-      .catch(() => toast.error("Error loading data"));
-  }, []);
-
-  useEffect(() => {
-    getAllModules();
-  }, []);
-
-  const users = useCallback(() => {
-    axios
-      .get(`api/user/all`)
+      .get(`api/course/select`)
       .then((res) => {
         console.log("Response", res.data);
-        setAllUsers(res.data);
+        setCourses(res.data);
       })
       .catch(() => toast.error("Error loading data"));
   }, []);
 
   useEffect(() => {
-    users();
+    getModules();
+    getCourses();
   }, []);
-
-  function MyModules() {
-    var filterData = allModules.filter(
-      (module: any) => module.lectureId === userId
-    );
-    return filterData.length;
-  }
-
-  function TotalStudents(){
-    var filterData = allUsers.filter((user : user) => user.isStudent === true);
-    return filterData.length;
-  }
 
   function Redirect(url: string) {
     navigate(url);
+  }
+
+  function LoadStudents(){
+    axios
+    .get(`api/user/students/courseId?id=${courseId}`)
+    .then((res) => {
+      console.log("Response", res.data);
+      setUsers(res.data);
+    })
+    .catch(() => toast.error("Error loading students"));
+  }
+
+  function Submit(){
+      var passed: boolean = true;
+    for(let key in studentIds){
+        axios
+      .post(`api/attendance/insert?moduleId=${selectedModule}&userId=${studentIds[key]}&date=${stringDate}`)
+      .then((res) => {
+        toast.success('Record added')
+      })
+      .catch(() => {
+          passed = false;
+      });
+    }
+    if(passed !== true){
+        toast.error('Error');
+    }
+  }
+
+  function AddStudent(e:any){
+      studentIds.push(parseInt(e.currentTarget.value));
   }
 
   return (
     <div
       className={
         isDarkMode
-          ? "lecture-dash-container dark-mode"
-          : "lecture-dash-container"
+          ? "lecture-attendance-container dark-mode"
+          : "lecture-attendance-container"
       }
     >
       <nav id="lectureNav" className={sideNavToggle ? "" : "nav-closed"}>
@@ -179,60 +198,77 @@ function Dashboard() {
           />
           <img src={Icon} alt="" />
         </div>
-        <div className="dash-content">
+        <div className="dash-content-reporting">
           <div className="overview">
             <div className="title">
               <i className="uil uil-tachometer-fast" />
-              <span className="text">Dashboard - Lecturer</span>
-            </div>
-            <div className="boxes">
-              <div className="box box1">
-                <i className="uil uil-book-open" />
-                <span className="text">Total Modules</span>
-                <span className="number">{allModules.length}</span>
-              </div>
-              <div className="box box2">
-                <i className="uil uil-cell" />
-                <span className="text">My Modules</span>
-                <span className="number">{MyModules()}</span>
-              </div>
-              <div className="box box3">
-                <i className="uil uil-user" />
-                <span className="text">Total Students</span>
-                <span className="number">{TotalStudents()}</span>
-              </div>
+              <span className="text">Attendance</span>
             </div>
           </div>
-          <div className="activity">
-            <div className="title">
-              <i className="uil uil-stopwatch" />
-              <span className="text">My Modules</span>
+          <hr />
+          <div className="row">
+            <div className="col">
+              <select
+                onChange={(e) => setCoureId(parseInt(e.currentTarget.value))}
+                className="form-control"
+                id="exampleFormControlSelect1"
+              >
+                <option>-- Select Course --</option>
+                {courses.map((x: course) => {
+                  return <option value={x.id}>{x.name}</option>;
+                })}
+              </select>
             </div>
-            <div className="activity-data">
-              <table className="table table-striped">
+            <div className="col">
+              <select
+                onChange={(e) => setSelectedModule(parseInt(e.currentTarget.value))}
+                className="form-control"
+                id="exampleFormControlSelect1"
+              >
+                <option>-- Select Module--</option>
+                {modules.map((x: module) => {
+                  return <option value={x.id}>{x.name}</option>;
+                })}
+              </select>
+            </div>
+            <div className="col">
+            <button onClick={() => LoadStudents()} type="button" className="btn btn-primary">
+            <i className="uil uil-eye" /> Load Students
+          </button>
+            </div>
+            <div className="col">
+            <button onClick={() => Submit()} type="button" className="btn btn-primary">
+             Submit
+          </button>
+            </div>
+          </div>
+          <br />
+          {users.length === 0 ? <i>Please select a course and a module to load data</i> : <table className="table table-striped course-table">
                 <thead>
                   <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Description</th>
+                    <th scope="col">Id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Surname</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Not In Class</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {modules.map((x: module) => {
+                  {users.map((x: user) => {
                     return (
-                      <>
-                        <tr>
-                          <th scope="row">{x.id}</th>
-                          <td>{x.name}</td>
-                          <td>{x.description}</td>
-                        </tr>
-                      </>
+                      <tr>
+                        <td>{x.id}</td>
+                        <td>{x.firstName}</td>
+                        <td>{x.lastName}</td>
+                        <td>{x.email}</td>
+                        <td>
+                        <input className="form-check-input" type="checkbox" name="attending" value={x.id} id="defaultCheck1" onChange={(e) => AddStudent(e)}/>
+                        </td>
+                      </tr>
                     );
                   })}
                 </tbody>
-              </table>
-            </div>
-          </div>
+              </table>}
         </div>
       </section>
       <ToastContainer />
@@ -240,4 +276,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default LectureAttendance;
