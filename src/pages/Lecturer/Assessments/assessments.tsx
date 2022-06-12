@@ -35,7 +35,48 @@ function LectureAssessments() {
 
   const [modules, setModules] = useState<module[]>([]);
 
-  const [selectedModule, setSelectedModule] = useState<number>(0);
+  const [moduleId, setSelectedModule] = useState<number>(0);
+
+  const [title, setTitle] = useState<string>('');
+
+  const [questionOneQ, setQuestionOneQ] = useState<string>('');
+
+  const [questionOneA, setQuestionOneA] = useState<string>('');
+
+  const [questionOneO, setQuestionOneO] = useState<string>('');
+
+  const [questionTwoQ, setQuestionTwoQ] = useState<string>('');
+
+  const [questionTwoA, setQuestionTwoA] = useState<string>('');
+
+  const [questionTwoO, setQuestionTwoO] = useState<string>('');
+
+  const [questionThreeQ, setQuestionThreeQ] = useState<string>('');
+
+  const [questionThreeA, setQuestionThreeA] = useState<string>('');
+
+  const [questionThreeO, setQuestionThreeO] = useState<string>('');
+
+  const [questionFourQ, setQuestionFourQ] = useState<string>('');
+
+  const [questionFourA, setQuestionFourA] = useState<string>('');
+
+  const [questionFourO, setQuestionFourO] = useState<string>('');
+
+  const [questionFiveQ, setQuestionFiveQ] = useState<string>('');
+
+  const [questionFiveA, setQuestionFiveA] = useState<string>('');
+
+  const [questionFiveO, setQuestionFiveO] = useState<string>('');
+
+  function AddAssessment(){
+    axios
+      .post(`api/assessments/insert?moduleId=${moduleId}&title=${title}&questionOneQ=${questionOneQ}&questionOneA=${questionOneA}&questionOneO=${questionOneO}&questionTwoQ=${questionTwoQ}&questionTwoA=${questionTwoA}&questionTwoO=${questionTwoO}&questionThreeQ=${questionThreeQ}&questionThreeA=${questionThreeA}&questionThreeO=${questionThreeO}&questionFourQ=${questionFourQ}&questionFourA=${questionFourA}&questionFourO=${questionFourO}&questionFiveQ=${questionFiveQ}&questionFiveA=${questionFiveA}&questionFiveO=${questionFiveO}`)
+      .then((res) => {
+        toast.success('Assessment Added')
+      })
+      .catch(() => toast.error("Error"));
+  }
 
   const getModules = useCallback(() => {
     axios
@@ -176,10 +217,10 @@ function LectureAssessments() {
               </select>
             </div>
             <div className="col">
-            <input className="form-control" type="text" placeholder="Assessment Title"/>
+            <input onChange={(e) => setTitle(e.currentTarget.value)} className="form-control" type="text" placeholder="Assessment Title"/>
             </div>
             <div className="col">
-              <button type="button" className="btn btn-primary">
+              <button onClick={() => AddAssessment()} type="button" className="btn btn-primary">
                 <i className="uil uil-upload" /> Upload Assessment
               </button>
             </div>
@@ -199,11 +240,11 @@ function LectureAssessments() {
                   data-parent="#accordion"
                 >
                   <div className={item1Show === true ? 'card-body' : 'card-body hidden'}>
-                  <input className="form-control" type="text" placeholder="Question"/>
+                  <input onChange={(e) => setQuestionOneQ(e.currentTarget.value)} className="form-control" type="text" placeholder="Question"/>
                   <br />
-                  <input className="form-control" type="text" placeholder="Correct Answer"/>
+                  <input onChange={(e) => setQuestionOneA(e.currentTarget.value)} className="form-control" type="text" placeholder="Correct Answer"/>
                   <br />
-                  <input className="form-control" type="text" placeholder="Optional Answer"/>
+                  <input onChange={(e) => setQuestionOneO(e.currentTarget.value)} className="form-control" type="text" placeholder="Optional Answer"/>
                   </div>
                 </div>
               </div>
@@ -220,11 +261,11 @@ function LectureAssessments() {
                   data-parent="#accordion"
                 >
                   <div className={item2Show === true ? 'card-body' : 'card-body hidden'}>
-                  <input className="form-control" type="text" placeholder="Question"/>
+                  <input onChange={(e) => setQuestionTwoQ(e.currentTarget.value)} className="form-control" type="text" placeholder="Question"/>
                   <br />
-                  <input className="form-control" type="text" placeholder="Correct Answer"/>
+                  <input onChange={(e) => setQuestionTwoA(e.currentTarget.value)} className="form-control" type="text" placeholder="Correct Answer"/>
                   <br />
-                  <input className="form-control" type="text" placeholder="Optional Answer"/>
+                  <input onChange={(e) => setQuestionTwoO(e.currentTarget.value)} className="form-control" type="text" placeholder="Optional Answer"/>
                   </div>
                 </div>
               </div>
@@ -241,11 +282,11 @@ function LectureAssessments() {
                   data-parent="#accordion"
                 >
                   <div className={item3Show === true ? 'card-body' : 'card-body hidden'}>
-                  <input className="form-control" type="text" placeholder="Question"/>
+                  <input onChange={(e) => setQuestionThreeQ(e.currentTarget.value)} className="form-control" type="text" placeholder="Question"/>
                   <br />
-                  <input className="form-control" type="text" placeholder="Correct Answer"/>
+                  <input onChange={(e) => setQuestionThreeA(e.currentTarget.value)} className="form-control" type="text" placeholder="Correct Answer"/>
                   <br />
-                  <input className="form-control" type="text" placeholder="Optional Answer"/>
+                  <input onChange={(e) => setQuestionThreeO(e.currentTarget.value)} className="form-control" type="text" placeholder="Optional Answer"/>
                   </div>
                 </div>
               </div>
@@ -262,11 +303,11 @@ function LectureAssessments() {
                   data-parent="#accordion"
                 >
                   <div className={item4Show === true ? 'card-body' : 'card-body hidden'}>
-                  <input className="form-control" type="text" placeholder="Question"/>
+                  <input onChange={(e) => setQuestionFourQ(e.currentTarget.value)} className="form-control" type="text" placeholder="Question"/>
                   <br />
-                  <input className="form-control" type="text" placeholder="Correct Answer"/>
+                  <input onChange={(e) => setQuestionFourA(e.currentTarget.value)} className="form-control" type="text" placeholder="Correct Answer"/>
                   <br />
-                  <input className="form-control" type="text" placeholder="Optional Answer"/>
+                  <input onChange={(e) => setQuestionFourO(e.currentTarget.value)} className="form-control" type="text" placeholder="Optional Answer"/>
                   </div>
                 </div>
               </div>
@@ -283,11 +324,11 @@ function LectureAssessments() {
                   data-parent="#accordion"
                 >
                   <div className={item5Show === true ? 'card-body' : 'card-body hidden'}>
-                  <input className="form-control" type="text" placeholder="Question"/>
+                  <input onChange={(e) => setQuestionFiveQ(e.currentTarget.value)} className="form-control" type="text" placeholder="Question"/>
                   <br />
-                  <input className="form-control" type="text" placeholder="Correct Answer"/>
+                  <input onChange={(e) => setQuestionFiveA(e.currentTarget.value)} className="form-control" type="text" placeholder="Correct Answer"/>
                   <br />
-                  <input className="form-control" type="text" placeholder="Optional Answer"/>
+                  <input onChange={(e) => setQuestionFiveO(e.currentTarget.value)} className="form-control" type="text" placeholder="Optional Answer"/>
                   </div>
                 </div>
               </div>

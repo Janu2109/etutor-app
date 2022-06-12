@@ -193,8 +193,8 @@ function Classes() {
             {classes.length === 0 ? <i>No classes for this user</i> : <table className="table table-striped course-table">
                 <thead>
                   <tr>
-                    <th scope="col">Id</th>
-                    <th scope="col">Module</th>
+                    <th scope="col">Class Id</th>
+                    <th scope="col">Module Id</th>
                     <th scope="col">Day</th>
                     <th scope="col">Start</th>
                     <th scope="col">End</th>
@@ -206,7 +206,7 @@ function Classes() {
                     return (
                       <tr>
                         <td>{x.id}</td>
-                        <td>{ReturnModule(x)}</td>
+                        <td>{x.moduleId}</td>
                         <td>{x.day}</td>
                         <td>{x.timeStart}</td>
                         <td>{x.timeEnd}</td>
