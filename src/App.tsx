@@ -16,6 +16,7 @@ import LectureReporting from "./pages/Lecturer/reporting/reporting";
 import LectureAnalytics from "./pages/Lecturer/analytics/analytics";
 import LectureAttendance from "./pages/Lecturer/Attendance/attendance";
 import LectureAssessments from "./pages/Lecturer/Assessments/assessments";
+import StudentAssessments from "./pages/student/Assessments/assessments";
 
 function App() {
   return (
@@ -67,6 +68,9 @@ function App() {
       </Routes>
       <Routes>
         <Route path="/lecture/assessments" element={<LectureAssessments />} />
+      </Routes>
+      <Routes>
+        <Route path="/student/assessments" element={<StudentAssessments />} />
       </Routes>
      </BrowserRouter>
   );

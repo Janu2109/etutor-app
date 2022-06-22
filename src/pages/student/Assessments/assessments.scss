@@ -16,12 +16,28 @@ body {
   --tran-03: all 0.2s ease;
 }
 
-.hidden{
-    display: none;
+
+
+
+
+.btn-success{
+    background-color: var(--primary-color);
+    border: var(--primary-color);
 }
 
-.black{
-    color: #000 !important;
+.student-assessment-accordion{
+  width: 100%;
+  .card{
+    cursor: pointer;
+  }
+}
+
+i{
+  color: var(--text-color);
+}
+
+.btn:hover{
+    background-color: var(--primary-color) !important;
 }
 
 .dark-mode {
@@ -71,13 +87,9 @@ body {
   background-color: none;
 }
 
-.lecture-attendance-container {
+.admin-courses-container {
   min-height: 100vh;
   background-color: var(--primary-color);
-
-  select{
-      max-width: 100%;
-  }
 
   .btn-primary{
     background-color: var(--primary-color);
@@ -120,7 +132,7 @@ body {
     }
   }
 
-  #lectureNav {
+  #adminNav {
     position: fixed;
     top: 0;
     left: 0;
@@ -290,10 +302,7 @@ body {
     }
   }
 
-  .dashboard-lecture-assessments {
-    i{
-      color: var(--title-icon-color);
-    }
+  .dashboard {
     position: relative;
     background-color: var(--panel-color);
     left: 250px;
@@ -302,14 +311,10 @@ body {
     padding: 10px 14px;
     transition: var(--tran-05);
 
-    .dash-content-reporting {
+    .dash-content {
       padding-top: 50px;
       display: block;
       width: 100%;
-
-      label{
-          color: var(--text-color);
-      }
 
       .title {
         display: flex;
@@ -389,24 +394,85 @@ body {
       }
       }
 
+      .activity{
+          max-width: 100%;
+        .activity-data{
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
+          align-items: center;
+          max-height: 50vh;
+          overflow-y: scroll;
+
+          .submit-button-quiz{
+            width: 100%;
+          }
+
+          #accordion{
+            width: 100%;
+
+            .card{
+              width: 100%;
+            }
+          }
+
+          .data-title{
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text-color);
+          }
+
+          .data{
+            flex-direction: column;
+            display: flex;
+            margin: 0 15px;
+
+            .data-list{
+              font-size: 18px;
+              font-weight: 400;
+              margin-top: 20px;
+              white-space: nowrap;
+              color: var(--text-color);
+            }
+          }
+
+          .course-table{
+            max-height: 50vh !important;
+            overflow-y: scroll;
+          }
+
+
+          table{
+            tbody{
+              border-top: var(--text-color);
+            }
+            
+            th{
+              color: var(--text-color);
+              
+            }
+            td{
+              color: var(--text-color);
+
+              button{
+                background-color: var(--primary-color);
+                border: var(--primary-color);
+                margin-left: 5px;
+              }
+
+              i{
+                color: var(--title-icon-color);
+              }
+            }
+          }
+        }
+      }
+
       .course-info{
           min-height: 10vh;
           background-color: #0e4bf1;
           width: 45%;
           float: left;
-      }
-
-      .left{
-        width: 50%;
-        float: left;
-        .echarts-for-react{
-          min-height: 100%;
-        }
-      }
-
-      .right{
-        width: 50%;
-        float: right;
       }
     }
 

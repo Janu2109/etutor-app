@@ -185,7 +185,7 @@ function LectureAssessments() {
         </div>
       </nav>
 
-      <section className="dashboard">
+      <section className="dashboard-lecture-assessments">
         <div className="top">
           <i
             className="uil uil-list-ul sidebar-toggle"
