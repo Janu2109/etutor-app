@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import logo from "../../../images/logo.png";
-import "./courses.scss";
+import "./communication.scss";
 import Icon from "../../../images/man.png";
 import axios from "../../../types/axios";
 import { user } from "../../../types/user";
@@ -11,44 +11,71 @@ import { useNavigate } from "react-router-dom";
 import ReactPlayer from "react-player/youtube";
 import { course } from "../../../types/course";
 import { lecture } from "../../../types/lecture";
+import {studentMarks} from '../../../types/studentMarks';
+import jsPDF from 'jspdf';
+import html2canvas from "html2canvas";
+import {module} from '../../../types/module';
+import {message} from '../../../types/message';
 
-function StudentCourses() {
-  const userId: user[] = useSelector((state: RootState) => state.user.value);
+function StudentCommunication() {
+  const userId: any = useSelector((state: RootState) => state.user.value);
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
 
   const [courses, setCourses] = useState<course[]>([]);
+  const [messages, setMessages] = useState<message[]>([]);
+
+  const [myMarks, setMarks] = useState<studentMarks[]>([]);
+
+  const [modules, setModules] = useState<module[]>([]);
+
+  const [selectedModule, setSelectedModule] = useState(0);
+
+  const [message, setMessage] = useState<string>('');
 
   const navigate = useNavigate();
 
-  const course = useCallback(() => {
-    axios
-      .get(`api/course/select`)
-      .then((res) => {
-        console.log("Response", res.data);
-        setCourses(res.data);
-      })
-      .catch(() => toast.error("Error loading data"));
-  }, []);
-
   useEffect(() => {
-    course();
-  }, []);
+    GetMessages();
+  },[selectedModule])
+
+  function SendMessage(){
+    axios
+      .post(`api/message/new?message=${message}&moduleId=${selectedModule}&userId=${userId}`)
+      .then((res) => {
+        toast.success('Message Sent');
+        GetMessages();
+      })
+      .catch(() => toast.error("Error sending message"));
+  }
+
+  
+  function GetMessages(){
+    axios
+      .get(`api/message/select?moduleId=${selectedModule}`)
+      .then((res) => {
+        setMessages(res.data);
+      })
+  }
 
   function Redirect(url: string) {
     navigate(url);
   }
 
-  function Enroll(courseId: number){
-        axios
-          .post(`api/enrollment/register?userId=${userId}&courseId=${courseId}`)
-          .then((res) => {
-            toast.success('You are now enrolled!');
-          })
-          .catch(() => toast.error("Something went wrong"));
-  }
+  const getModules = useCallback(() => {
+    axios
+      .get(`api/module/student/modules?userId=${userId}`)
+      .then((res) => {
+        setModules(res.data);
+      })
+      .catch(() => toast.error("Error loading data"));
+  }, []);
+
+  useEffect(() => {
+    getModules();
+  }, []);
 
   return (
     <div
@@ -111,7 +138,6 @@ function StudentCourses() {
             </li>
           </ul>
           <ul className="logout-mod">
-          
             <li onClick={() => Redirect("/")}>
               <a href="#">
                 <i className="uil uil-signout" />
@@ -147,56 +173,43 @@ function StudentCourses() {
           <div className="overview">
             <div className="title">
               <i className="uil uil-tachometer-fast" />
-              <span className="text">Course Enrollment</span>
-            </div>
-            <div className="boxes">
-            <table className="table table-striped course-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Duration</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {courses.map((x: course) => {
-                    return (
-                      <tr>
-                        <td>{x.name}</td>
-                        <td>{x.description}</td>
-                        <td>{x.duration}</td>
-                        <td>
-                         
-                          <button
-                            type="button"
-                            className="btn btn-success"
-                            onClick={() => Enroll(x.id)}
-                          >
-                            Enroll
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="activity">
-            <div className="title">
-              <i className="uil uil-play" />
-              <span className="text">Why Enrol?</span>
-            </div>
-            <div className="activity-data">
-              {/* Video player here */}
-              <ReactPlayer url={'https://www.youtube.com/watch?v=HndV87XpkWg'} width={'5000px'} height={'600px'} controls={true}/>
+              <span className="text">Communication</span>
             </div>
           </div>
         </div>
+        <label htmlFor="exampleFormControlSelect1">Module</label>
+          <select onChange={(e) => setSelectedModule(parseInt(e.currentTarget.value))} className="form-control" id="exampleFormControlSelect1">
+            <option>-- Select Module --</option>
+            {modules.map((x: module) => {
+                return (
+                    <option value={x.id}>{x.name}</option>
+                )
+            })}
+          </select>
+          <br />
+          <input onChange={(e) => setMessage(e.currentTarget.value)} className="form-control" type="text" placeholder="Type Message here"/>
+          <br />
+          <button onClick={() => SendMessage()} type="button" className="btn btn-primary">Send Message</button>
+          <br />
+          <br />
+          {messages.length > 0 ? (<>
+          <div className="com-container">
+          {messages.map((x: message) => {
+            return (
+              <div className={x.userId === userId ? 'com-message-self' : 'com-message-other'}>
+                <b>{x.firstName} {x.lastName}</b>
+                <hr/>
+                <p>{x.message}</p>
+              </div>
+            )
+          
+          })}
+          </div>
+          </>):(<></>)}
       </section>
       <ToastContainer />
     </div>
   );
 }
 
-export default StudentCourses;
+export default StudentCommunication;

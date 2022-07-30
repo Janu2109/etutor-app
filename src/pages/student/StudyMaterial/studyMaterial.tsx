@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import logo from "../../../images/logo.png";
-import "./courses.scss";
+import "./studyMaterial.scss";
 import Icon from "../../../images/man.png";
 import axios from "../../../types/axios";
 import { user } from "../../../types/user";
@@ -11,43 +11,59 @@ import { useNavigate } from "react-router-dom";
 import ReactPlayer from "react-player/youtube";
 import { course } from "../../../types/course";
 import { lecture } from "../../../types/lecture";
+import {module} from '../../../types/module';
+import {classes} from '../../../types/classes';
+import { files } from "../../../types/files";
 
-function StudentCourses() {
+function StudentStudyMaterial() {
   const userId: user[] = useSelector((state: RootState) => state.user.value);
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   const [sideNavToggle, setSideNavToggle] = useState<boolean>(true);
 
+  const [classes, setClasses] = useState<classes[]>([])
+
+  const [files, setFiles] = useState<files[]>([])
+
   const [courses, setCourses] = useState<course[]>([]);
+  const [modules, setModules] = useState<module[]>([]);
 
   const navigate = useNavigate();
 
-  const course = useCallback(() => {
+  const myModules = useCallback(() => {
     axios
-      .get(`api/course/select`)
+      .get(`api/module/student/modules?userId=${userId}`)
       .then((res) => {
-        console.log("Response", res.data);
-        setCourses(res.data);
+        setModules(res.data);
       })
-      .catch(() => toast.error("Error loading data"));
+      .catch(() => toast.error("You are not enrolled"));
   }, []);
 
   useEffect(() => {
-    course();
+    myModules();
   }, []);
 
   function Redirect(url: string) {
     navigate(url);
   }
 
-  function Enroll(courseId: number){
-        axios
-          .post(`api/enrollment/register?userId=${userId}&courseId=${courseId}`)
-          .then((res) => {
-            toast.success('You are now enrolled!');
-          })
-          .catch(() => toast.error("Something went wrong"));
+  function ModuleSelected(e: any) {
+    axios
+      .get(`api/files/module?moduleId=${e.currentTarget.value}`)
+      .then((res) => {
+        setFiles(res.data);
+      })
+      .catch(() => toast.error("Error"));
+  }
+
+  function DownloadFile(name: string){
+    axios
+    .get(`api/files/download?name=${name}`)
+    .then((res) => {
+      window.open(`https://localhost:7122/api/files/download?name=${name}`);
+    })
+    .catch(() => toast.error("Error"));
   }
 
   return (
@@ -111,7 +127,12 @@ function StudentCourses() {
             </li>
           </ul>
           <ul className="logout-mod">
-          
+          {/* <li onClick={() => Redirect("/student/profile")}>
+              <a href="#">
+                <i className="uil uil-user-circle" />
+                <span className="link-name">Profile</span>
+              </a>
+            </li> */}
             <li onClick={() => Redirect("/")}>
               <a href="#">
                 <i className="uil uil-signout" />
@@ -150,46 +171,49 @@ function StudentCourses() {
               <span className="text">Course Enrollment</span>
             </div>
             <div className="boxes">
-            <table className="table table-striped course-table">
+            <select
+                    onChange={(e) => ModuleSelected(e)}
+                    className="form-control"
+                    id="exampleFormControlSelect1"
+                  >
+                    <option>-- Select Module --</option>
+                    {modules.map((x: module) => {
+                      return <option value={x.id}>{x.name}</option>;
+                    })}
+                  </select>
+                 <br/>
+                 {files.length > 0 ? (
+                    <>
+                    <table className="table table-striped course-table">
                 <thead>
                   <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Duration</th>
+                    <th scope="col">ModuleId</th>
+                    <th scope="col">FileName</th>
+                    <th scope="col">Download</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {courses.map((x: course) => {
+                  {files.map((x: files) => {
                     return (
                       <tr>
+                        <td>{x.moduleId}</td>
                         <td>{x.name}</td>
-                        <td>{x.description}</td>
-                        <td>{x.duration}</td>
-                        <td>
-                         
-                          <button
+                        <td><button
                             type="button"
-                            className="btn btn-success"
-                            onClick={() => Enroll(x.id)}
+                            className="btn btn-success" onClick={() => DownloadFile(x.name)}
                           >
-                            Enroll
-                          </button>
-                        </td>
+                            Download
+                          </button></td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
-            </div>
-          </div>
-          <div className="activity">
-            <div className="title">
-              <i className="uil uil-play" />
-              <span className="text">Why Enrol?</span>
-            </div>
-            <div className="activity-data">
-              {/* Video player here */}
-              <ReactPlayer url={'https://www.youtube.com/watch?v=HndV87XpkWg'} width={'5000px'} height={'600px'} controls={true}/>
+                    </>
+                 ) : (<>
+                    <i>No files to display</i>
+                 </>)}
+            
             </div>
           </div>
         </div>
@@ -199,4 +223,4 @@ function StudentCourses() {
   );
 }
 
-export default StudentCourses;
+export default StudentStudyMaterial;

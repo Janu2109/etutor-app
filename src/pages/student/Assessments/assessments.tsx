@@ -136,6 +136,12 @@ function StudentAssessments() {
     mark = mark * 100 / 5;
     setQuizMark(mark);
     setView(0);
+    axios
+      .post(`api/marks/new?mark=${mark}&moduleId=${selectedModule}&userId=${userId}`)
+      .then((res) => {
+        toast.success(`You scored ${mark}`);
+      })
+      .catch(() => toast.error("Error loading data"));
   }
 
   return (
@@ -199,12 +205,7 @@ function StudentAssessments() {
             </li>
           </ul>
           <ul className="logout-mod">
-            <li onClick={() => Redirect("/student/profile")}>
-              <a href="#">
-                <i className="uil uil-user-circle" />
-                <span className="link-name">Profile</span>
-              </a>
-            </li>
+            
             <li onClick={() => Redirect("/")}>
               <a href="#">
                 <i className="uil uil-signout" />

@@ -17,6 +17,12 @@ import LectureAnalytics from "./pages/Lecturer/analytics/analytics";
 import LectureAttendance from "./pages/Lecturer/Attendance/attendance";
 import LectureAssessments from "./pages/Lecturer/Assessments/assessments";
 import StudentAssessments from "./pages/student/Assessments/assessments";
+import StudentClasses from "./pages/student/Classes/classes";
+import StudentStudyMaterial from "./pages/student/StudyMaterial/studyMaterial";
+import StudentReporting from "./pages/student/Reporting/reporting";
+import AdminCommunication from "./pages/admin/communication/communication";
+import LectureCommunication from "./pages/Lecturer/communication/communication";
+import StudentCommunication from "./pages/student/Communication/communication";
 
 function App() {
   return (
@@ -71,6 +77,24 @@ function App() {
       </Routes>
       <Routes>
         <Route path="/student/assessments" element={<StudentAssessments />} />
+      </Routes>
+      <Routes>
+        <Route path="/student/classes" element={<StudentClasses />} />
+      </Routes>
+      <Routes>
+        <Route path="/student/studyMaterial" element={<StudentStudyMaterial />} />
+      </Routes>
+      <Routes>
+        <Route path="/student/reporting" element={<StudentReporting />} />
+      </Routes>
+      <Routes>
+        <Route path="/admin/communication" element={<AdminCommunication />} />
+      </Routes>
+      <Routes>
+        <Route path="/lecture/communication" element={<LectureCommunication />} />
+      </Routes>
+      <Routes>
+        <Route path="/student/communication" element={<StudentCommunication />} />
       </Routes>
      </BrowserRouter>
   );

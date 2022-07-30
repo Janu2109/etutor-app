@@ -389,8 +389,7 @@ function Modules() {
                   type="button"
                   className="btn btn-primary"
                   onClick={() => InsertModule()}
-                >
-                  <i className="uil uil-plus" /> Add Record
+                >Add Record
                 </button>
               </div>
               <div className="col">

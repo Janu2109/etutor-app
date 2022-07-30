@@ -327,8 +327,7 @@ function ManageCourses() {
                   onClick={() => InsertCourse()}
                   type="button"
                   className="btn btn-primary"
-                >
-                  <i className="uil uil-plus" /> Add Record
+                > Add Record
                 </button>
               </div>
               <div className="col">

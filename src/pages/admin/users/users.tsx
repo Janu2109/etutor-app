@@ -289,8 +289,7 @@ function SetUpdateInfo(x: user){
                   type="button"
                   className="btn btn-primary"
                   onClick={() => UpdateRole()}
-                >
-                  <i className="uil uil-pen" /> Edit User
+                > Edit User
                 </button>
               </div>
               <div className="col">

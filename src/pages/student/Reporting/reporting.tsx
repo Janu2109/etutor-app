@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import logo from "../../../images/logo.png";
-import "./courses.scss";
+import "./reporting.scss";
 import Icon from "../../../images/man.png";
 import axios from "../../../types/axios";
 import { user } from "../../../types/user";
@@ -11,8 +11,11 @@ import { useNavigate } from "react-router-dom";
 import ReactPlayer from "react-player/youtube";
 import { course } from "../../../types/course";
 import { lecture } from "../../../types/lecture";
+import {studentMarks} from '../../../types/studentMarks';
+import jsPDF from 'jspdf';
+import html2canvas from "html2canvas";
 
-function StudentCourses() {
+function StudentReporting() {
   const userId: user[] = useSelector((state: RootState) => state.user.value);
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
@@ -21,33 +24,35 @@ function StudentCourses() {
 
   const [courses, setCourses] = useState<course[]>([]);
 
+  const [myMarks, setMarks] = useState<studentMarks[]>([]);
+
   const navigate = useNavigate();
 
-  const course = useCallback(() => {
+  const marks = useCallback(() => {
     axios
-      .get(`api/course/select`)
-      .then((res) => {
-        console.log("Response", res.data);
-        setCourses(res.data);
+      .get(`api/marks/student/marks?studentId=${userId}`)
+      .then((res) => {setMarks(res.data);
       })
       .catch(() => toast.error("Error loading data"));
   }, []);
 
   useEffect(() => {
-    course();
+    marks();
   }, []);
 
   function Redirect(url: string) {
     navigate(url);
   }
 
-  function Enroll(courseId: number){
-        axios
-          .post(`api/enrollment/register?userId=${userId}&courseId=${courseId}`)
-          .then((res) => {
-            toast.success('You are now enrolled!');
-          })
-          .catch(() => toast.error("Something went wrong"));
+  function SaveMarks(){
+    const input: HTMLElement = document.getElementById('marksTbl')!;
+    html2canvas(input)
+    .then((canvas: any) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF();
+      pdf.addImage(imgData, 'PNG', 5, 15, 200, 25);
+      pdf.save("MarksReport.pdf");  
+    })
   }
 
   return (
@@ -111,7 +116,6 @@ function StudentCourses() {
             </li>
           </ul>
           <ul className="logout-mod">
-          
             <li onClick={() => Redirect("/")}>
               <a href="#">
                 <i className="uil uil-signout" />
@@ -147,49 +151,31 @@ function StudentCourses() {
           <div className="overview">
             <div className="title">
               <i className="uil uil-tachometer-fast" />
-              <span className="text">Course Enrollment</span>
+              <span className="text">Student Marks Report</span>
             </div>
             <div className="boxes">
-            <table className="table table-striped course-table">
+              <table className="table table-striped course-table" id="marksTbl">
                 <thead>
                   <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Duration</th>
+                    <th scope="col">Mark</th>
+                    <th scope="col">Module Id</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {courses.map((x: course) => {
+                  {myMarks.map((x: studentMarks) => {
                     return (
                       <tr>
-                        <td>{x.name}</td>
-                        <td>{x.description}</td>
-                        <td>{x.duration}</td>
-                        <td>
-                         
-                          <button
-                            type="button"
-                            className="btn btn-success"
-                            onClick={() => Enroll(x.id)}
-                          >
-                            Enroll
-                          </button>
-                        </td>
+                        <td>{x.mark}</td>
+                        <td>{x.moduleId}</td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
-            </div>
-          </div>
-          <div className="activity">
-            <div className="title">
-              <i className="uil uil-play" />
-              <span className="text">Why Enrol?</span>
-            </div>
-            <div className="activity-data">
-              {/* Video player here */}
-              <ReactPlayer url={'https://www.youtube.com/watch?v=HndV87XpkWg'} width={'5000px'} height={'600px'} controls={true}/>
+              <br />
+              <button type="button" className="btn btn-primary" onClick={() => SaveMarks()}>
+                Download Marks
+              </button>
             </div>
           </div>
         </div>
@@ -199,4 +185,4 @@ function StudentCourses() {
   );
 }
 
-export default StudentCourses;
+export default StudentReporting;
