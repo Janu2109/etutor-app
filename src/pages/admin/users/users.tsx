@@ -6,8 +6,14 @@ import axios from "../../../types/axios";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { user } from "../../../types/user";
+import {RootState} from '../../../redux/store';
+import { useSelector, useDispatch } from "react-redux";
+import {setDarkMode} from '../../../redux/slice/darkSlice';
 
 function Users() {
+  const darkMode: boolean = useSelector((state: RootState) => state.dark.value);
+
+  const dispatch = useDispatch();
 
   const [userId, setUserId] = useState<number>(0);
 
@@ -114,7 +120,7 @@ function SetUpdateInfo(x: user){
   return (
     <div
       className={
-        isDarkMode
+        darkMode
           ? "admin-courses-container dark-mode"
           : "admin-courses-container"
       }
@@ -186,7 +192,7 @@ function SetUpdateInfo(x: user){
               </a>
               <div
                 className="mode-toggle"
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={() => dispatch(setDarkMode(!darkMode))}
               >
                 <span className="switch"></span>
               </div>

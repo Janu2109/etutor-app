@@ -20,20 +20,24 @@ function SignUp({setView}:{setView: Dispatch<SetStateAction<number>>}) {
 
   function SignUp(){
     setErrorCode(0);
+    var error = 0;
     var emptyString = "";
     if (email !== '' && validator.isEmail(email)) {
       setErrorCode(0)
     } else {
      toast.error('Invalid Email');
      setErrorCode(2);
+     error = 2;
     }
-    if(username === emptyString || password === emptyString || firstname === emptyString || lastname === emptyString || idnumber === 0 || city === emptyString || email === emptyString){
+    if(error !== 2 && username === emptyString || password === emptyString || firstname === emptyString || lastname === emptyString || idnumber === 0 || city === emptyString || email === emptyString){
         toast.error("All fields are required");
         setErrorCode(2);
+        error = 2;
     }
     else if(idnumber.length < 13|| idnumber.length > 13){
       toast.error("Id number length not correct");
       setErrorCode(2);
+      error = 2;
     }
     else if(idnumber.length > 12 && idnumber.length < 14){
       if (validator.isStrongPassword(password, {
@@ -44,10 +48,11 @@ function SignUp({setView}:{setView: Dispatch<SetStateAction<number>>}) {
         setErrorCode(0);
       } else {
         setErrorCode(2);
+        error = 2;
         toast.error('Password requires uppercase and numbers')
       }
     }
-    if(errorCode !== 2){
+    if(error !== 2){
       axios.post(`api/user/register?userName=${username}&password=${password}&firstName=${firstname}&lastName=${lastname}&idNo=${idnumber}&city=${city}&email=${email}`)
       .then(() => {
         toast.success('User Registered');

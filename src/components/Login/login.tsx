@@ -18,8 +18,15 @@ function Login({ setView }: { setView: Dispatch<SetStateAction<number>> }) {
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [ip ,setIP] = useState('');
 
   var emptyString = "";
+
+  const LogHistory = async (userId: number) => {
+    const res = await axios.get('https://geolocation-db.com/json/').then((res) => {
+      axios.post(`api/loginhistory/new?userId=${userId}&ip=${res.data.IPv4}`);
+    })
+  }
 
   function Login() {
     if (username === emptyString) {
@@ -30,6 +37,7 @@ function Login({ setView }: { setView: Dispatch<SetStateAction<number>> }) {
       axios
         .get(`api/user/login?username=${username}&password=${password}`)
         .then((res) => {
+          LogHistory(res.data.id);
           dispatch(login(res.data.id));
           if(res.data.isAdministrator === true){
             navigate("/admin/dashboard");

@@ -52,6 +52,8 @@ body {
   --box2-color: #3a3b3c;
   --box3-color: #3a3b3c;
   --title-icon-color: #ccc;
+
+  
 }
 
 .btn-primary{
@@ -108,6 +110,8 @@ body {
     }
   }
 
+  
+
   #adminNav {
     position: fixed;
     top: 0;
@@ -118,6 +122,8 @@ body {
     z-index: 2;
     padding: 10px 14px;
     border-right: 1px solid var(--border-color);
+
+    
 
     * {
       margin: 0;

@@ -12,10 +12,16 @@ import ReactECharts from 'echarts-for-react';
 import { title } from "process";
 import { user } from "../../../types/user";
 import ReactPlayer from "react-player";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {message} from '../../../types/message';
+import {setDarkMode} from '../../../redux/slice/darkSlice';
+
 
 function AdminCommunication() {
+  const darkMode: boolean = useSelector((state: RootState) => state.dark.value);
+
+  const dispatch = useDispatch();
+
     const userId: any = useSelector((state: RootState) => state.user.value);
    
   const [selectedModule, setSelectedModule] = useState(0);
@@ -94,7 +100,7 @@ function AdminCommunication() {
   return (
     <div
       className={
-        isDarkMode
+        darkMode
           ? "admin-courses-container dark-mode"
           : "admin-courses-container"
       }
@@ -166,7 +172,7 @@ function AdminCommunication() {
               </a>
               <div
                 className="mode-toggle"
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={() => dispatch(setDarkMode(!darkMode))}
               >
                 <span className="switch"></span>
               </div>

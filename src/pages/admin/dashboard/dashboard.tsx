@@ -7,8 +7,15 @@ import { user } from "../../../types/user";
 import { ToastContainer, toast } from "react-toastify";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
+import {RootState} from '../../../redux/store';
+import { useSelector, useDispatch } from "react-redux";
+import {setDarkMode} from '../../../redux/slice/darkSlice';
 
 function Dashboard() {
+  const darkMode: boolean = useSelector((state: RootState) => state.dark.value);
+
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
@@ -60,7 +67,7 @@ function Dashboard() {
   return (
     <div
       className={
-        isDarkMode ? "admin-dash-container dark-mode" : "admin-dash-container"
+        darkMode ? "admin-dash-container dark-mode" : "admin-dash-container"
       }
     >
       <nav id="adminNav" className={sideNavToggle ? "" : "nav-closed"}>
@@ -130,7 +137,7 @@ function Dashboard() {
               </a>
               <div
                 className="mode-toggle"
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={() => dispatch(setDarkMode(!darkMode))}
               >
                 <span className="switch"></span>
               </div>

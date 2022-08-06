@@ -19,8 +19,15 @@ import {
 import { module } from "../../../types/module";
 import { lecture } from "../../../types/lecture";
 import { user } from "../../../types/user";
+import {RootState} from '../../../redux/store';
+import { useSelector, useDispatch } from "react-redux";
+import {setDarkMode} from '../../../redux/slice/darkSlice';
 
 function Modules() {
+  const darkMode: boolean = useSelector((state: RootState) => state.dark.value);
+
+  const dispatch = useDispatch();
+
   const [basicModal, setBasicModal] = useState(false);
 
   const [addName, setAddName] = useState<string>("");
@@ -148,7 +155,7 @@ function Modules() {
   return (
     <div
       className={
-        isDarkMode
+        darkMode
           ? "admin-courses-container dark-mode"
           : "admin-courses-container"
       }
@@ -220,7 +227,7 @@ function Modules() {
               </a>
               <div
                 className="mode-toggle"
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={() => dispatch(setDarkMode(!darkMode))}
               >
                 <span className="switch"></span>
               </div>

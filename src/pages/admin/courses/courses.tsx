@@ -16,8 +16,15 @@ import {
   MDBModalBody,
   MDBModalFooter,
 } from "mdb-react-ui-kit";
+import {RootState} from '../../../redux/store';
+import { useSelector, useDispatch } from "react-redux";
+import {setDarkMode} from '../../../redux/slice/darkSlice';
 
 function ManageCourses() {
+  const darkMode: boolean = useSelector((state: RootState) => state.dark.value);
+
+  const dispatch = useDispatch();
+
   const [basicModal, setBasicModal] = useState(false);
 
   const toggleShow = () => setBasicModal(!basicModal);
@@ -116,7 +123,7 @@ function ManageCourses() {
   return (
     <div
       className={
-        isDarkMode
+        darkMode
           ? "admin-courses-container dark-mode"
           : "admin-courses-container"
       }
@@ -188,7 +195,7 @@ function ManageCourses() {
               </a>
               <div
                 className="mode-toggle"
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={() => dispatch(setDarkMode(!darkMode))}
               >
                 <span className="switch"></span>
               </div>

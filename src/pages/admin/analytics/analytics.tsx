@@ -11,9 +11,16 @@ import ReactECharts from 'echarts-for-react';
 import { title } from "process";
 import { user } from "../../../types/user";
 import ReactPlayer from "react-player";
+import {RootState} from '../../../redux/store';
+import { useSelector, useDispatch } from "react-redux";
+import {setDarkMode} from '../../../redux/slice/darkSlice';
 
 function AdminAnalytics() {
   const [basicModal, setBasicModal] = useState(false);
+
+  const darkMode: boolean = useSelector((state: RootState) => state.dark.value);
+
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
@@ -149,7 +156,7 @@ function AdminAnalytics() {
   return (
     <div
       className={
-        isDarkMode
+        darkMode
           ? "admin-courses-container dark-mode"
           : "admin-courses-container"
       }
@@ -221,7 +228,7 @@ function AdminAnalytics() {
               </a>
               <div
                 className="mode-toggle"
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={() => dispatch(setDarkMode(!darkMode))}
               >
                 <span className="switch"></span>
               </div>

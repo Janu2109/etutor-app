@@ -233,7 +233,7 @@ function LectureAttendance() {
             </div>
             <div className="col">
             <button onClick={() => LoadStudents()} type="button" className="btn btn-primary">
-            <i className="uil uil-eye" /> Load Students
+            Load Students
           </button>
             </div>
             <div className="col">

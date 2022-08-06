@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import userReducer from './slice/userSlice';
+import darkReducer from './slice/darkSlice';
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    dark: darkReducer
   },
 })
 

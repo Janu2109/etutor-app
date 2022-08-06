@@ -14,15 +14,21 @@ import ReactPlayer from "react-player";
 import { classes } from "../../../types/classes";
 import { studentsEnrolled } from "../../../types/studentsEnrolled";
 import { isJSDocTypedefTag } from "typescript";
-import jsPDF from 'jspdf';
+import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { CSVLink } from "react-csv";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../../redux/store";
+import { setDarkMode } from "../../../redux/slice/darkSlice";
+import { loginHistory } from "../../../types/loginHistory";
+import "jspdf-autotable";
 
 function AdminReporting() {
-    
+  const darkMode: boolean = useSelector((state: RootState) => state.dark.value);
 
-  const [view, setView] = useState('');
+  const dispatch = useDispatch();
 
-  console.log(view);
+  const [view, setView] = useState("");
 
   const navigate = useNavigate();
 
@@ -34,17 +40,28 @@ function AdminReporting() {
 
   const [modules, setModules] = useState<module[]>([]);
 
-  const [classes, setClasses] = useState<classes[]>([])
+  const [classes, setClasses] = useState<classes[]>([]);
 
-  const [studentsEnrolled, setStudentsEnrolled] = useState<studentsEnrolled[]>([]);
+  const [studentsEnrolled, setStudentsEnrolled] = useState<studentsEnrolled[]>(
+    []
+  );
 
   const [users, setUsers] = useState<user[]>([]);
+
+  const [logHistory, setLogHistory] = useState<loginHistory[]>([]);
 
   var students = users.filter((x: user) => x.isStudent === true);
 
   var lecturers = users.filter((x: user) => x.isLecturer === true);
 
   var admins = users.filter((x: user) => x.isAdministrator === true);
+
+  var date: any = new Date();
+  date = date.toLocaleDateString([], {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 
   const getCourses = useCallback(() => {
     axios
@@ -91,85 +108,212 @@ function AdminReporting() {
       .catch(() => toast.error("Error loading data"));
   }, []);
 
+  const getLoginHistory = useCallback(() => {
+    axios
+      .get(`api/loginhistory/select`)
+      .then((res) => {
+        setLogHistory(res.data);
+      })
+      .catch(() => toast.error("Error loading login history"));
+  }, []);
+
   useEffect(() => {
     getCourses();
     getModules();
     getUsers();
     getClasses();
     getStudentsEnrolled();
+    getLoginHistory();
   }, []);
 
   function Redirect(url: string) {
     navigate(url);
   }
 
-  function ReturnRole(x: user){
-    if(x.isStudent === true){
-        return 'Student';
-    }else if(x.isLecturer === true){
-        return 'Lecturer';
-    }else return 'Admin';
-}
+  function ReturnRole(x: user) {
+    if (x.isStudent === true) {
+      return "Student";
+    } else if (x.isLecturer === true) {
+      return "Lecturer";
+    } else return "Admin";
+  }
 
-function SaveModules(){
-  const input: HTMLElement = document.getElementById('moduleTbl')!;
-  html2canvas(input)
-  .then((canvas: any) => {
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF();
-    pdf.addImage(imgData, 'PNG', 5, 15, 200, 25);
-    pdf.save("ModulesReport.pdf");  
-  })
-}
+  function SaveModules() {
+    // const input: HTMLElement = document.getElementById("moduleTbl")!;
+    // html2canvas(input).then((canvas: any) => {
+    //   const imgData = canvas.toDataURL("image/png");
+    //   const pdf = new jsPDF();
+    //   pdf.addImage(imgData, "PNG", 5, 15, 200, 25);
+    //   pdf.save("ModulesReport.pdf");
+    // });
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "portrait"; // portrait or landscape
 
-function SaveCourses(){
-  const input: HTMLElement = document.getElementById('CoursesTbl')!;
-  html2canvas(input)
-  .then((canvas: any) => {
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF();
-    pdf.addImage(imgData, 'PNG', 5, 15, 200, 35);
-    pdf.save("CoursesReport.pdf");  
-  })
-}
+    const marginLeft = 40;
+    const doc = new jsPDF(orientation, unit, size);
 
-function SaveClasses(){
-  const input: HTMLElement = document.getElementById('classesTbl')!;
-  html2canvas(input)
-  .then((canvas: any) => {
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF();
-    pdf.addImage(imgData, 'PNG', 5, 15, 200, 35);
-    pdf.save("ClassesReport.pdf");  
-  })
-}
+    doc.setFontSize(15);
 
-function SaveUsers(){
-  const input: HTMLElement = document.getElementById('usersTbl')!;
-  html2canvas(input)
-  .then((canvas: any) => {
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF();
-    pdf.addImage(imgData, 'PNG', 5, 15, 200, 45);
-    pdf.save("UsersReport.pdf");
-  })
-}
+    const title = `Modules - ${date}`;
+    const headers = [['Name', 'Description', 'LectureId', 'CourseId']];
 
-function SaveStudentsEnrolled(){
-  const input: HTMLElement = document.getElementById('studEnrolledTbl')!;
-  html2canvas(input)
-  .then((canvas: any) => {
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF();
-    pdf.addImage(imgData, 'PNG', 5, 15, 200, 45);
-    pdf.save("StudEnrolledReport.pdf");
-  })
-}
+    const data = modules.map((elt: module) => [elt.name, elt.description, elt.lectureId, elt.courseId]);
+
+    let content = {
+      startY: 50,
+      head: headers,
+      body: data
+    };
+
+    doc.text(title, marginLeft, 40);
+    (doc as any).autoTable(content);
+    doc.save(`Modules_${date}.pdf`)
+  }
+
+  function SaveCourses() {
+    // const input: HTMLElement = document.getElementById("CoursesTbl")!;
+    // html2canvas(input).then((canvas: any) => {
+    //   const imgData = canvas.toDataURL("image/png");
+    //   const pdf = new jsPDF();
+    //   pdf.addImage(imgData, "PNG", 5, 15, 200, 35);
+    //   pdf.save("CoursesReport.pdf");
+    // });
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "portrait"; // portrait or landscape
+
+    const marginLeft = 40;
+    const doc = new jsPDF(orientation, unit, size);
+
+    doc.setFontSize(15);
+
+    const title = `Courses - ${date}`;
+    const headers = [['Name', 'Description', 'Duration']];
+
+    const data = courses.map((elt: course) => [elt.name, elt.description, elt.duration]);
+
+    let content = {
+      startY: 50,
+      head: headers,
+      body: data
+    };
+
+    doc.text(title, marginLeft, 40);
+    (doc as any).autoTable(content);
+    doc.save(`Courses_${date}.pdf`)
+  }
+
+  function SaveClasses() {
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "portrait"; // portrait or landscape
+
+    const marginLeft = 40;
+    const doc = new jsPDF(orientation, unit, size);
+
+    doc.setFontSize(15);
+
+    const title = `Classes - ${date}`;
+    const headers = [['Lecture', 'Module', 'Day', 'Start', 'End']];
+
+    const data = classes.map((elt: classes) => [elt.lectureId, elt.moduleId, elt.day, elt.timeStart, elt.timeEnd]);
+
+    let content = {
+      startY: 50,
+      head: headers,
+      body: data
+    };
+
+    doc.text(title, marginLeft, 40);
+    (doc as any).autoTable(content);
+    doc.save(`Classes_${date}.pdf`)
+  }
+
+ 
+
+  function SaveUsers() {
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "portrait"; // portrait or landscape
+
+    const marginLeft = 40;
+    const doc = new jsPDF(orientation, unit, size);
+
+    doc.setFontSize(15);
+
+    const title = `Users Active - ${date}`;
+    const headers = [['Role', 'First Name', 'Last Name', 'City']];
+
+    const data = users.map((elt: user) => [ReturnRole(elt), elt.firstName, elt.lastName, elt.city]);
+
+    let content = {
+      startY: 50,
+      head: headers,
+      body: data
+    };
+
+    doc.text(title, marginLeft, 40);
+    (doc as any).autoTable(content);
+    doc.save(`UsersActive_${date}.pdf`)
+  }
+
+  function SaveStudentsEnrolled() {
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "portrait"; // portrait or landscape
+
+    const marginLeft = 40;
+    const doc = new jsPDF(orientation, unit, size);
+
+    doc.setFontSize(15);
+
+    const title = `Students Enrolled - ${date}`;
+    const headers = [['First Name', 'Last Name', 'Email', 'Course']];
+
+    const data = studentsEnrolled.map((elt: studentsEnrolled) => [elt.firstName, elt.lastName, elt.email, elt.name]);
+
+    let content = {
+      startY: 50,
+      head: headers,
+      body: data
+    };
+
+    doc.text(title, marginLeft, 40);
+    (doc as any).autoTable(content);
+    doc.save(`StudentsEnrolled_${date}.pdf`)
+  }
+
+  function SaveLoginHistory(){
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "portrait"; // portrait or landscape
+
+    const marginLeft = 40;
+    const doc = new jsPDF(orientation, unit, size);
+
+    doc.setFontSize(15);
+
+    const title = `Login History - ${date}`;
+    const headers = [['IP Address', 'City', 'Date', 'User']];
+
+    const data = logHistory.map((elt: loginHistory) => [elt.ip, elt.city, elt.date, elt.firstName + '_' +elt.lastName]);
+
+    let content = {
+      startY: 50,
+      head: headers,
+      body: data
+    };
+
+    doc.text(title, marginLeft, 40);
+    (doc as any).autoTable(content);
+    doc.save(`LoginHistory${date}.pdf`)
+  }
 
   return (
     <div
       className={
-        isDarkMode
+        darkMode
           ? "admin-courses-container dark-mode"
           : "admin-courses-container"
       }
@@ -241,7 +385,7 @@ function SaveStudentsEnrolled(){
               </a>
               <div
                 className="mode-toggle"
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={() => dispatch(setDarkMode(!darkMode))}
               >
                 <span className="switch"></span>
               </div>
@@ -267,20 +411,43 @@ function SaveStudentsEnrolled(){
           </div>
           <hr />
           <label htmlFor="exampleFormControlSelect1">Report Type</label>
-          <select onChange={(e) => setView(e.currentTarget.value)} className="form-control" id="exampleFormControlSelect1">
+          <select
+            onChange={(e) => setView(e.currentTarget.value)}
+            className="form-control"
+            id="exampleFormControlSelect1"
+          >
             <option>-- Select --</option>
-            <option value={'Modules'}>Modules</option>
-            <option value={'Courses'}>Courses</option>
-            <option value={'Classes'}>Classes</option>
-            <option value={'Users'}>Users</option>
-            <option value={'Enrolled'}>Students Enrolled</option>
+            <option value={"Modules"}>Modules</option>
+            <option value={"Courses"}>Courses</option>
+            <option value={"Classes"}>Classes</option>
+            <option value={"Users"}>Users</option>
+            <option value={"Enrolled"}>Students Enrolled</option>
+            <option value={"LogHistory"}>System Login History</option>
           </select>
           <br />
-          {view === 'Modules' && 
-          <>
-          <button onClick={() => SaveModules()} type="button" className="btn btn-primary">Generate PDF</button>
-          <br />
-          <table id='moduleTbl' className="table table-striped course-table">
+          {view === "Modules" && (
+            <>
+              <button
+                onClick={() => SaveModules()}
+                type="button"
+                className="btn btn-primary"
+              >
+                Generate PDF
+              </button>
+              <br />
+              <br />
+              <CSVLink
+                data={modules}
+                filename={`Modules_${date}`}
+                className="btn btn-primary mb-3"
+              >
+                Export to Excel
+              </CSVLink>
+              <br />
+              <table
+                id="moduleTbl"
+                className="table table-striped course-table"
+              >
                 <thead>
                   <tr>
                     <th scope="col">Name</th>
@@ -297,19 +464,36 @@ function SaveStudentsEnrolled(){
                         <td>{x.description}</td>
                         <td>{x.lectureId}</td>
                         <td>{x.courseId}</td>
-                       
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
             </>
-          }
-          {view === 'Courses' && 
+          )}
+          {view === "Courses" && (
             <>
-            <button onClick={() => SaveCourses()} type="button" className="btn btn-primary">Generate PDF</button>
-            <br />
-            <table id='CoursesTbl' className="table table-striped course-table">
+              <button
+                onClick={() => SaveCourses()}
+                type="button"
+                className="btn btn-primary"
+              >
+                Generate PDF
+              </button>
+              <br />
+              <br />
+              <CSVLink
+                data={courses}
+                filename={`Courses_${date}`}
+                className="btn btn-primary mb-3"
+              >
+                Export to Excel
+              </CSVLink>
+              <br />
+              <table
+                id="CoursesTbl"
+                className="table table-striped course-table"
+              >
                 <thead>
                   <tr>
                     <th scope="col">#</th>
@@ -326,19 +510,82 @@ function SaveStudentsEnrolled(){
                         <td>{x.name}</td>
                         <td>{x.description}</td>
                         <td>{x.duration}</td>
-                        
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
-              </>
-          }
-          {view === 'Classes' && 
-           <>
-           <button onClick={() => SaveClasses()} type="button" className="btn btn-primary">Generate PDF</button>
-           <br />
-           <table id='classesTbl' className="table table-striped course-table">
+            </>
+          )}
+          {view === "LogHistory" && (
+            <>
+              <button onClick={() => SaveLoginHistory()} type="button" className="btn btn-primary">
+                Generate PDF
+              </button>
+              <br />
+              <br />
+              <CSVLink
+                data={logHistory}
+                filename={`LoginHistory_${date}`}
+                className="btn btn-primary mb-3"
+              >
+                Export to Excel
+              </CSVLink>
+              <br />
+              <table
+                id="CoursesTbl"
+                className="table table-striped course-table"
+              >
+                <thead>
+                  <tr>
+                    <th scope="col">User</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">IP Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logHistory.map((x: loginHistory) => {
+                    return (
+                      <tr>
+                        <td>
+                          {x.firstName} {x.lastName}
+                        </td>
+                        <td>{x.city}</td>
+                        <td>
+                          {x.date}
+                        </td>
+                        <td>{x.ip}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </>
+          )}
+          {view === "Classes" && (
+            <>
+              <button
+                onClick={() => SaveClasses()}
+                type="button"
+                className="btn btn-primary"
+              >
+                Generate PDF
+              </button>
+              <br />
+              <br />
+              <CSVLink
+                data={classes}
+                filename={`Classes_${date}`}
+                className="btn btn-primary mb-3"
+              >
+                Export to Excel
+              </CSVLink>
+              <br />
+              <table
+                id="classesTbl"
+                className="table table-striped course-table"
+              >
                 <thead>
                   <tr>
                     <th scope="col">#</th>
@@ -364,13 +611,28 @@ function SaveStudentsEnrolled(){
                   })}
                 </tbody>
               </table>
-             </>
-          }
-          {view === 'Users' && 
-              <>
-              <button onClick={() => SaveUsers()} type="button" className="btn btn-primary">Generate PDF</button>
+            </>
+          )}
+          {view === "Users" && (
+            <>
+              <button
+                onClick={() => SaveUsers()}
+                type="button"
+                className="btn btn-primary"
+              >
+                Generate PDF
+              </button>
               <br />
-              <table id='usersTbl' className="table table-striped course-table">
+              <br />
+              <CSVLink
+                data={users}
+                filename={`UsersActive_${date}`}
+                className="btn btn-primary mb-3"
+              >
+                Export to Excel
+              </CSVLink>
+              <br />
+              <table id="usersTbl" className="table table-striped course-table">
                 <thead>
                   <tr>
                     <th scope="col">Id</th>
@@ -379,7 +641,6 @@ function SaveStudentsEnrolled(){
                     <th scope="col">Email</th>
                     <th scope="col">City</th>
                     <th scope="col">Role</th>
-                   
                   </tr>
                 </thead>
                 <tbody>
@@ -391,28 +652,44 @@ function SaveStudentsEnrolled(){
                         <td>{x.lastName}</td>
                         <td>{x.email}</td>
                         <td>{x.city}</td>
-                    
+
                         <td>{ReturnRole(x)}</td>
-                       
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
-                </>
-          }
-          {view === 'Enrolled' && 
-             <>
-             <button onClick={() => SaveStudentsEnrolled()} type="button" className="btn btn-primary">Generate PDF</button>
-             <br />
-             <table id='studEnrolledTbl' className="table table-striped course-table">
+            </>
+          )}
+          {view === "Enrolled" && (
+            <>
+              <button
+                onClick={() => SaveStudentsEnrolled()}
+                type="button"
+                className="btn btn-primary"
+              >
+                Generate PDF
+              </button>
+              <br />
+              <br />
+              <CSVLink
+                data={studentsEnrolled}
+                filename={`StudentsEnrolled_${date}`}
+                className="btn btn-primary mb-3"
+              >
+                Export to Excel
+              </CSVLink>
+              <br />
+              <table
+                id="studEnrolledTbl"
+                className="table table-striped course-table"
+              >
                 <thead>
                   <tr>
                     <th scope="col">First Name</th>
                     <th scope="col">LastName</th>
                     <th scope="col">Email</th>
                     <th scope="col">Course</th>
-                   
                   </tr>
                 </thead>
                 <tbody>
@@ -428,8 +705,8 @@ function SaveStudentsEnrolled(){
                   })}
                 </tbody>
               </table>
-               </>
-          }
+            </>
+          )}
         </div>
       </section>
       <ToastContainer />
