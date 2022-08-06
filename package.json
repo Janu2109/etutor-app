@@ -1,4 +1,5 @@
 {
+  "homrpage": "http://Janu2109.github.io/etutor-app",
   "name": "etutor-app",
   "version": "0.1.0",
   "private": true,
@@ -48,6 +49,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "CI=false && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -77,6 +80,7 @@
     "@types/react-datetime-picker": "^3.4.1",
     "@types/react-transition-group": "^4.4.4",
     "@types/validator": "^13.7.1",
+    "gh-pages": "^4.0.0",
     "node-sass": "^7.0.1"
   }
 }
