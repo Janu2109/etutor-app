@@ -12,6 +12,8 @@ import { title } from "process";
 import { user } from "../../../types/user";
 import ReactPlayer from "react-player";
 import { classes } from "../../../types/classes";
+import { adminClasses } from "../../../types/adminClasses";
+import { adminModules } from "../../../types/adminModules";
 import { studentsEnrolled } from "../../../types/studentsEnrolled";
 import { isJSDocTypedefTag } from "typescript";
 import jsPDF from "jspdf";
@@ -38,9 +40,9 @@ function AdminReporting() {
 
   const [courses, setCourses] = useState<course[]>([]);
 
-  const [modules, setModules] = useState<module[]>([]);
+  const [modules, setModules] = useState<adminModules[]>([]);
 
-  const [classes, setClasses] = useState<classes[]>([]);
+  const [classes, setClasses] = useState<adminClasses[]>([]);
 
   const [studentsEnrolled, setStudentsEnrolled] = useState<studentsEnrolled[]>(
     []
@@ -83,7 +85,7 @@ function AdminReporting() {
 
   const getModules = useCallback(() => {
     axios
-      .get(`api/module/select`)
+      .get(`api/adminmodules/select`)
       .then((res) => {
         setModules(res.data);
       })
@@ -92,7 +94,7 @@ function AdminReporting() {
 
   const getClasses = useCallback(() => {
     axios
-      .get(`api/classes/all`)
+      .get(`api/adminclasses/select`)
       .then((res) => {
         setClasses(res.data);
       })
@@ -156,9 +158,9 @@ function AdminReporting() {
     doc.setFontSize(15);
 
     const title = `Modules - ${date}`;
-    const headers = [['Name', 'Description', 'LectureId', 'CourseId']];
+    const headers = [['Name', 'Description', 'Course', 'Lecture']];
 
-    const data = modules.map((elt: module) => [elt.name, elt.description, elt.lectureId, elt.courseId]);
+    const data = modules.map((elt: adminModules) => [elt.name, elt.description, elt.course, `${elt.lectureFirstName}_${elt.lectureLastName}`]);
 
     let content = {
       startY: 50,
@@ -215,9 +217,9 @@ function AdminReporting() {
     doc.setFontSize(15);
 
     const title = `Classes - ${date}`;
-    const headers = [['Lecture', 'Module', 'Day', 'Start', 'End']];
+    const headers = [['Module','Day', 'Start', 'End', 'Lecture']];
 
-    const data = classes.map((elt: classes) => [elt.lectureId, elt.moduleId, elt.day, elt.timeStart, elt.timeEnd]);
+    const data = classes.map((elt: adminClasses) => [elt.module, elt.day, elt.timeStart, elt.timeEnd, `${elt.lectureFirstName}_${elt.lectureLastName}`]);
 
     let content = {
       startY: 50,
@@ -457,13 +459,13 @@ function AdminReporting() {
                   </tr>
                 </thead>
                 <tbody>
-                  {modules.map((x: module) => {
+                  {modules.map((x: adminModules) => {
                     return (
                       <tr>
                         <td>{x.name}</td>
                         <td>{x.description}</td>
-                        <td>{x.lectureId}</td>
-                        <td>{x.courseId}</td>
+                        <td>{x.lectureFirstName} {x.lectureLastName}</td>
+                        <td>{x.course}</td>
                       </tr>
                     );
                   })}
@@ -588,24 +590,22 @@ function AdminReporting() {
               >
                 <thead>
                   <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">LectureId</th>
-                    <th scope="col">ModuleId</th>
+                    <th scope="col">Module</th>
                     <th scope="col">Day</th>
                     <th scope="col">Start</th>
                     <th scope="col">End</th>
+                    <th scope="col">Lecture</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {classes.map((x: classes) => {
+                  {classes.map((x: adminClasses) => {
                     return (
                       <tr>
-                        <td>{x.id}</td>
-                        <td>{x.lectureId}</td>
-                        <td>{x.moduleId}</td>
+                        <td>{x.module}</td>
                         <td>{x.day}</td>
                         <td>{x.timeStart}</td>
                         <td>{x.timeEnd}</td>
+                        <td>{x.lectureFirstName} {x.lectureLastName}</td>
                       </tr>
                     );
                   })}
