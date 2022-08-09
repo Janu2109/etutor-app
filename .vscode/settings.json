@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/8dc0551c-57ad-4ef8-bc89-ca917238ea60/microsoft.web/sites/subscriptions/8dc0551c-57ad-4ef8-bc89-ca917238ea60/resourceGroups/NMU-TurboJs-Project/providers/Microsoft.Web/sites/NMU-TurboJs",
+    "appService.deploySubpath": "."
+}
