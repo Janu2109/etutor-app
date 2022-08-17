@@ -258,7 +258,7 @@ function ManageCourses() {
 
                     <MDBModalFooter>
                       <button onClick={() => EditCourse()} type="button" className="btn btn-primary">
-                        <i className="uil uil-pen" /> Edit
+                        Edit
                       </button>
                     </MDBModalFooter>
                   </MDBModalContent>
